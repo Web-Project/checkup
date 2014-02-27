@@ -11,8 +11,8 @@ class GithubController extends AbstractActionController
 
     public function indexAction()
     {
-        echo "Fetching changes from git server";
-        echo exec('git pull origin master');
+        echo "Fetching changes from git server<br/>";
+        echo exec('git pull origin master') . "<br/>";
         echo "Already up to date for test";
     }
 }

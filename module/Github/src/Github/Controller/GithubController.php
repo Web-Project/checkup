@@ -5,7 +5,7 @@ namespace Github\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
-class AlbumController extends AbstractActionController
+class GithubController extends AbstractActionController
 {
     protected $albumTable;
 

@@ -1,4 +1,4 @@
-SetEnv ZF2_PATH /vendor/zendframework/zendframework/library
+SetEnv ZF2_PATH "vendor/zendframework/zendframework/library"
 
 RewriteEngine On
 # The following rule tells Apache that if the requested filename

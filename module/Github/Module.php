@@ -1,10 +1,7 @@
 <?php
 
-namespace Album;
+namespace Github;
 
-use Album\Model\Album;
-use Album\Model\AlbumTable;
-use Album\Model\AlbumSecond;
 use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\TableGateway\TableGateway;
 

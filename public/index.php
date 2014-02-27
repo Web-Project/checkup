@@ -1,5 +1,5 @@
 <?php
-echo "index";
+
 /**
   * Display all errors when APPLICATION_ENV is development.
   */
@@ -21,6 +21,6 @@ if (php_sapi_name() === 'cli-server' && is_file(__DIR__ . parse_url($_SERVER['RE
 
 // Setup autoloading
 require 'init_autoloader.php';
-
+echo "index";
 // Run the application!
 Zend\Mvc\Application::init(require 'config/application.config.php')->run();

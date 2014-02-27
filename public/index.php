@@ -1,5 +1,5 @@
 <?php
-
+echo "index";
 /**
   * Display all errors when APPLICATION_ENV is development.
   */

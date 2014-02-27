@@ -13,9 +13,9 @@
  * to the application root now.
  */
 chdir(dirname(__DIR__));
-echo dirname(__DIR__);
+//echo dirname(__DIR__);
 set_include_path(get_include_path() . PATH_SEPARATOR . dirname(__DIR__));
-echo get_include_path();
+//echo get_include_path();
 // Decline static file requests back to the PHP built-in webserver
 if (php_sapi_name() === 'cli-server' && is_file(__DIR__ . parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH))) {
     return false;

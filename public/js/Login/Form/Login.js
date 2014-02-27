@@ -9,7 +9,9 @@
 
         layout  : 'column',
         frame       : false,
-        border      : false,
+        width   : 300,
+        border      : true,
+        //renderTo    : Ext.getBody(),
 
         initComponent : function()
         {

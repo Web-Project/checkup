@@ -5,7 +5,8 @@
         extend  : 'Ext.window.Window',
 
         title   : 'Checkup Motor Parts Admin Panel Login',
-        renderTo: Ext.getBody(),
+        renderTo: Ext.get('main-panel'),
+        id      : 'login-window',
 
         width   : 300,
 

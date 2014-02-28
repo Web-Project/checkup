@@ -125,56 +125,128 @@
     });
 
 
-    function refreshAllGrid()
-    {
-        fileStore.load({params : { type :'formatter' }});
-    }
-
-    function btnHandler(btn)
-    {
-        var form;
-        var action;
-
-        switch(selectedTab)
+    var menu_bar = [
         {
-            case 1:
-                form = 'Formatter';
-                break;
-            case 2:
-                form = 'Mapper';
-                break;
-            case 3:
-                form = 'Transmitter';
-                break;
+            xtype   : 'button',
+            text    : 'File',
+            menu    : {
+                items   : [
+                    {
+                        text    : 'Menu 1',
+                        menu    : {
+                            items   : [
+                                {
+                                    text    : 'Submenu'
+                                }
+                            ]
+                        }
+                    }, {
+                        text    : 'Menu 2'
+                    }
+                ]
+            }
+        }, {
+            xtype   : 'button',
+            text    : 'Module',
+            menu    : {
+                items   : [
+                    {
+                        text    : 'Administration',
+                        iconCls : 'default-icon',
+                        menu    : {
+                            items   : [
+                                {
+                                    text    : 'Submenu'
+                                }
+                            ]
+                        }
+                    }, {
+                        text    : 'Sales',
+                        menu    : {
+                            items   : [
+                                {
+                                    text    : 'Submenu'
+                                }
+                            ]
+                        }
+                    }, {
+                        text    : 'Purchasing',
+                        menu    : {
+                            items   : [
+                                {
+                                    text    : 'Submenu'
+                                }
+                            ]
+                        }
+                    }, {
+                        text    : 'Business Partners',
+                        menu    : {
+                            items   : [
+                                {
+                                    text    : 'Submenu'
+                                }
+                            ]
+                        }
+                    }, {
+                        text    : 'Inventory',
+                        menu    : {
+                            items   : [
+                                {
+                                    text    : 'Item Master Data'
+                                }, {
+                                    text    : 'Inventory Transaction',
+                                    menu    : {
+                                        items   : [
+                                            {
+                                                text : 'Goods Receipt'
+                                            }, {
+                                                text : 'Goods Issued'
+                                            }, {
+                                                text : 'Inventory Transfer'
+                                            }
+                                        ]
+                                    }
+                                }, {
+                                    text    : 'Item Search'
+                                }
+                            ]
+                        }
+                    }, {
+                        text    : 'Reports',
+                        iconCls : 'default-icon'
+                    }
+                ]
+            }
+        }, {
+            xtype   : 'button',
+            text    : 'Windows',
+            menu    : {
+                items   : [
+                    {
+                        text    : 'Menu 1',
+                        menu    : {
+                            items   : [
+                                {
+                                    text    : 'Submenu'
+                                }
+                            ]
+                        }
+                    }, {
+                        text    : 'Menu 2'
+                    }
+                ]
+            }
         }
-
-
-        if(btn.id == 'btn-add')
-        {
-            action = 'Add';
-            console.log('add Tools.' + form + '.Window.Add');
-        }
-        else if(btn.id == 'btn-edit')
-        {
-            action = 'Edit';
-            console.log('edit Tools.' + form + '.Window.Edit');
-        }
-        else if(btn.id == 'btn-delete')
-        {
-            action = 'Delete';
-            console.log('delete Tools.' + form + '.Window.Delete');
-        }
-
-        Ext.create('Checkup.' + form + '.Window.' + action).show();
-    }
+    ];
 
     Ext.define('Checkup.Panel',
     {
-        extend      : 'Ext.tab.Panel',
-        title       : 'Job Distribution Tools',
+        extend      : 'Ext.panel.Panel',
+        title       : 'Checkout Motor Parts Admin Panel',
         renderTo    : Ext.get('container'),
-        id          : 'tabpanel-main',
-        layout      : 'fit',
+        id          : 'panel-main',
+        layout      : 'column',
+        iconCls     : 'default-icon',
 
         tools: [
             {
@@ -190,64 +262,20 @@
             }
         ],
 
-        initComponent : function() {
+        border  : false,
+        tbar    : { 
+            border:false, 
+            items: menu_bar 
+        },
 
-            this.items = [
-                {
-                    title  : 'Formatter',
-                    layout  : 'column',
-                    //items   : [gridFormatterFile]
-                }, {
-                    title   : 'Mapper',
-                    layout  : 'column',
-                    //items   : [gridMapperFile]
-                }, {
-                    title   : 'Transmitter',
-                    layout  : 'column',
-                    //items   : [gridTransmitterFile]
-                }
-            ];
+        initComponent : function() {
             this.superclass.initComponent.call(this);
 
             //refreshAllGrid()
         },
 
         listeners : {
-            tabchange : function(tp, newTab)
-            {
-
-                if(newTab.title == 'Formatter')
-                {
-                    fileStore.load({params : { type :'formatter' }});
-                    selectedTab = 1;
-                }
-                else if(newTab.title == 'Mapper')
-                {
-                    fileStore.load({params : { type :'mapper' }});
-                    selectedTab = 2;
-                }
-                else if(newTab.title == 'Transmitter')
-                {
-                    fileStore.load({params : { type :'transmitter' }});
-                    selectedTab = 3;
-                }
-            }
-        },
-
-        buttons : [
-            {
-                text    : 'Add',
-                id      : 'btn-add',
-                handler : btnHandler
-            }, {
-                text    : 'Edit',
-                id      : 'btn-edit',
-                handler : btnHandler
-            }, {
-                text    : 'Delete',
-                id      : 'btn-delete',
-                handler : btnHandler
-            }
-        ]
+            
+        }
     });
 })();

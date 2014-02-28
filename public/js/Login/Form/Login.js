@@ -92,7 +92,7 @@
                 text    : 'Cancel',
                 handler : function() 
                 {
-
+                    me.getForm().reset();
                 }
             }
         ]

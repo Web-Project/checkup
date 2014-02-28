@@ -21,13 +21,17 @@
     }
 
     #login-window {
-        height : 153px !important;
+        height : 163px !important;
         width : 300px !important;
+    }
+
+    #login-window-body {
+        height: 133px !important;
     }
 
     #ext-gen1038
     {
-        height : 149px !important;
+        height : 159px !important;
         width : 300px !important;
     }
 
@@ -35,7 +39,18 @@
     {
         width : 300px !important;
     }
+
+    #ext-gen1038.x-mask
+    {
+        display : none;
+    }
+
+    #ext-gen1039.x-css-shadow {
+        width : 300px !important;
+        height : 159px !important;
+    }
 </style>
+
 <script type="text/javascript">
-    Ext.create('Checkup.Login.Window.Login').show();
+    Ext.create('Checkup.Login.Window.Login', {token : '<?php echo $token;?>'}).show();
 </script>

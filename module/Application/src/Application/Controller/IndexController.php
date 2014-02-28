@@ -28,10 +28,13 @@ class IndexController extends AbstractActionController
     public function indexAction()
     {
         
-        //session_destroy();
         if(empty($this->_sessionContainer->user_id))
         {
-            $view = new ViewModel();
+            $view = new ViewModel(
+                array(
+                    'token' => $this->NoCSRF()->generate('token')
+                )
+            );
             $view->setTemplate('application/index/login');
 
             return $view;

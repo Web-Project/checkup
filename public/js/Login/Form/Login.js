@@ -37,6 +37,10 @@
                             allowBlank  : false,
                             margin      : 5
                         }, {
+                            xtype       : 'hiddenfield',
+                            name        : 'token',
+                            id          : 'token'
+                        }, {
                             xtype       : 'textfield',
                             columnWidth : 1,
                             inputType   : 'password',
@@ -51,6 +55,8 @@
             ];
 
             this.superclass.initComponent.call(this);
+
+            //Ext.getCmp('token').setValue(this.token);
         },
 
         buttons     : [

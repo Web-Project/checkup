@@ -12,7 +12,7 @@
 
         initComponent : function() {
 
-            this.items = Ext.create('Checkup.Login.Form.Login');
+            this.items = Ext.create('Checkup.Login.Form.Login', {token : this.token});
 
             this.superclass.initComponent.call(this);
         },

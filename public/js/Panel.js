@@ -1,129 +1,6 @@
 (function(){
 
-    var fileUrl = 'files.php?m=GetFiles';
-
-    /**
-     * Flag to get the seelcted tab
-     * @type {Number}
-     * 1 = Formatter
-     * 2 = Mapper
-     */
-    var selectedTab = 1;
-
-    var fileStore = Ext.create('Ext.data.Store', {
-        proxy   : { 
-            url             : fileUrl,
-            type            : 'ajax',
-            actionMethods   : 'POST',
-            reader          : { 
-                type            :'json',
-                root            : 'rows',
-                totalProperty   : 'totalRecords'
-            },
-            simpleSortMode : true,
-            timeout        :600000
-        },
-        fields: ['file', 'file_id', 'site_id', 'format']
-    });
-
-
-
-    var gridFormatterFile = Ext.create('Checkup.Util.GridSearch.Panel', {
-        store: fileStore,
-        id  : 'grid-files-formatter',
-        columnLines: true,
-        columns: [
-            {
-                text        : 'Files',
-                dataIndex   : 'file',
-                flex        : 1
-            }, {
-                text        : 'Format ID',
-                dataIndex   : 'file_id',
-                flex        : 1
-            }, {
-                text        : 'Site ID(s)',
-                dataIndex   : 'site_id',
-                flex        : 1,
-                renderer    : function(value)
-                {
-                    return "<div title='" + value + "' >" + value + "</div>";
-                }
-            }, {
-                text        : 'Format',
-                dataIndex   : 'format',
-                flex        : 1
-            }
-        ],
-        columnWidth : 1,
-        border      : true,
-        frame       : false,
-        viewConfig: {
-            stripeRows: true
-        },
-        height  : Ext.getBody().getViewSize().height - 90
-    });
-
-    var gridMapperFile = Ext.create('Checkup.Util.GridSearch.Panel', {
-        store: fileStore,
-        id  : 'grid-files-mapper',
-        columnLines: true,
-        columns: [
-            {
-                text        : 'Files',
-                dataIndex   : 'file',
-                flex        : 1
-            }, {
-                text        : 'Site ID',
-                dataIndex   : 'file_id',
-                flex        : 1
-            }
-        ],
-        columnWidth : 1,
-        border      : true,
-        frame       : false,
-        viewConfig: {
-            stripeRows: true
-        },
-        height  : Ext.getBody().getViewSize().height - 90
-    });
-
-    var gridTransmitterFile = Ext.create('Checkup.Util.GridSearch.Panel', {
-        store: fileStore,
-        id  : 'grid-files-transmitter',
-        columnLines: true,
-        columns: [
-            {
-                text        : 'Files',
-                dataIndex   : 'file',
-                flex        : 1
-            }, {
-                text        : 'Transmit ID',
-                dataIndex   : 'file_id',
-                flex        : 1
-            }, {
-                text        : 'Site ID(s)',
-                dataIndex   : 'site_id',
-                flex        : 1,
-                renderer    : function(value)
-                {
-                    return "<div title='" + value + "' >" + value + "</div>";
-                }
-            }, {
-                text        : 'Transmission Type',
-                dataIndex   : 'format',
-                flex        : 1
-            }
-        ],
-        columnWidth : 1,
-        border      : true,
-        frame       : false,
-        viewConfig: {
-            stripeRows: true
-        },
-        height  : Ext.getBody().getViewSize().height - 90
-    });
-
+    var token;
 
     var menu_bar = [
         {
@@ -239,6 +116,27 @@
         }
     ];
 
+    function logout()
+    {
+        msg = Ext.Msg.wait('Logging out');
+
+        Ext.Ajax.request({ 
+            url: 'application/index/logout', 
+            params: { 
+                token : token
+            }, 
+            success: function (resp, opt) {
+                result = Ext.JSON.decode(resp.responseText);
+                msg = Ext.Msg.wait('Redirecting');
+                window.location = result.redirect;
+            },
+            failure : function(resp, opt)
+            {
+                result = Ext.JSON.decode(resp.responseText);
+            }
+        });
+    }
+
     Ext.define('Checkup.Panel',
     {
         extend      : 'Ext.panel.Panel',
@@ -248,19 +146,6 @@
         layout      : 'column',
         iconCls     : 'default-icon',
 
-        tools: [
-            {
-                type: 'gear',
-                width: 'auto',
-                renderTpl: [
-                    'Welcome Admin',
-                    '&nbsp;|&nbsp;<u>Logout</u>'
-                ],
-                handler: function () {
-                    window.location = 'application/index/logout';
-                }
-            }
-        ],
 
         border  : false,
         tbar    : { 
@@ -268,10 +153,22 @@
             items: menu_bar 
         },
 
-        initComponent : function() {
-            this.superclass.initComponent.call(this);
+        initComponent : function() { 
 
-            //refreshAllGrid()
+            token = this.token;
+
+            this.tools = [
+                {
+                    type: 'gear',
+                    width: 'auto',
+                    renderTpl: [
+                        'Welcome Admin',
+                        '&nbsp;|&nbsp;<u>Logout</u>'
+                    ],
+                    handler: logout
+                }
+            ];
+            this.superclass.initComponent.call(this);
         },
 
         listeners : {

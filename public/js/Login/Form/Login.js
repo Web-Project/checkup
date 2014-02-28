@@ -37,10 +37,6 @@
                             allowBlank  : false,
                             margin      : 5
                         }, {
-                            xtype       : 'hiddenfield',
-                            name        : 'token',
-                            id          : 'token'
-                        }, {
                             xtype       : 'textfield',
                             columnWidth : 1,
                             inputType   : 'password',
@@ -49,6 +45,10 @@
                             name        : 'password',
                             allowBlank  : false,
                             margin      : 5
+                        }, {
+                            xtype       : 'hiddenfield',
+                            name        : 'token',
+                            id          : 'csrf-token'
                         }
                     ]
                 }
@@ -56,7 +56,7 @@
 
             this.superclass.initComponent.call(this);
 
-            //Ext.getCmp('token').setValue(this.token);
+            Ext.getCmp('csrf-token').setValue(this.token);
         },
 
         buttons     : [
@@ -70,9 +70,10 @@
                     {
                         form.submit({
                             url     : submitUrl,
-                            waitMsg : 'Loggin in',
+                            waitMsg : 'Logging in',
                             success : function(response, responseText) {
 
+                                msg = Ext.Msg.wait('Redirecting');
                                 window.location = responseText.result.redirect;
                             },
                             failure : function(response, responseText) {

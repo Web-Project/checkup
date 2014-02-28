@@ -14,6 +14,8 @@ use Zend\View\Model\ViewModel;
 use Zend\Session\Container;
 use Zend\View\Model\JsonModel;
 
+use \Exception;
+
 class IndexController extends AbstractActionController
 {
     private $_sessionContainer;
@@ -27,12 +29,12 @@ class IndexController extends AbstractActionController
 
     public function indexAction()
     {
-        
+        $token  = $this->NoCSRF()->generate('token');
         if(empty($this->_sessionContainer->user_id))
         {
             $view = new ViewModel(
                 array(
-                    'token' => $this->NoCSRF()->generate('token')
+                    'token' => $token
                 )
             );
             $view->setTemplate('application/index/login');
@@ -40,42 +42,86 @@ class IndexController extends AbstractActionController
             return $view;
         }
 
-        return new ViewModel();
+        return new ViewModel(
+            array(
+                'token' => $token
+            ));
     }
 
     public function loginAction()
     {
+        $retVal = array(
+            "success" => true,
+            "message" => "Logged in",
+            "redirect" => "/"
+        );
+
         $request = $this->getRequest();
 
         if ($request->isPost()) 
         {
             $postData = $request->getPost();
 
-            if($postData['username'] == 'admin' && $postData['password'] == 'admin')
-            {
-                $this->_sessionContainer->user_id = '123';
+            try
+            {   
+                $this->NoCSRF()->check( 'token', $postData, true, 60*10, false);
 
-                return new JsonModel(array(
-                                    "success" => true,
-                                    "message" => "Logged in",
-                                    "redirect" => "/"
-                                ));
+
+                if($postData['username'] == 'admin' && $postData['password'] == 'admin')
+                {
+                    $this->_sessionContainer->user_id = '123';
+                }
+            } 
+            catch(\Exception $e) 
+            {
+                $retVal = array(
+                    "success" => false,
+                    "errorMessage" => "Invalid request source",
+                    "redirect" => "/"
+                );
             }
+
         }
         else
         {
-            return new JsonModel(array(
-                                    "success" => false,
-                                    "message" => "Logged out",
-                                    "redirect" => "/"
-                                ));
+            $retVal = array(
+                "success" => false,
+                "errorMessage" => "Logged out",
+                "redirect" => "/"
+            );
         }
+
+        return new JsonModel($retVal);
     }
 
     public function logoutAction()
     {
-        session_destroy();
+        $retVal = array(
+            "success" => true,
+            "message" => "Logged out",
+            "redirect" => "/"
+        );
 
-        return $this->redirect()->toRoute('home');
+        try
+        {  
+            $request = $this->getRequest();
+            $postData = $request->getPost(); 
+            $this->NoCSRF()->check( 'token', $postData, true, 60*10, false);
+
+            session_destroy();
+
+        } 
+        catch(\Exception $e) 
+        {
+            $retVal = array(
+                "success" => false,
+                "errorMessage" => "Invalid request source",
+                "redirect" => "/"
+            );
+        }
+
+        
+        return new JsonModel($retVal);
+        
     }
 }

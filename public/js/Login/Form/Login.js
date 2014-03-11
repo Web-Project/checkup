@@ -81,7 +81,7 @@
                                     'Failed',
                                     responseText.result.errorMessage,
                                     function(){
-                                        me.getForm().reset();
+                                        window.location = responseText.result.redirect;
                                     }
                                 );
                             }

@@ -12,6 +12,9 @@ namespace Application;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 
+use Application\Model\Users;
+use Application\Model\Model;
+
 class Module
 {
     public function onBootstrap(MvcEvent $e)
@@ -38,5 +41,23 @@ class Module
                 ),
             ),
          );
+    }
+
+    public function getServiceConfig()
+    {
+        return array(
+            'factories' => array(
+                'Application\Model\Users' =>  function($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $table = new Users($dbAdapter);
+                    return $table;
+                },
+                'Application\Model\Model' =>  function($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $table = new Model($dbAdapter);
+                    return $table;
+                },
+            ),
+        );
     }
 }

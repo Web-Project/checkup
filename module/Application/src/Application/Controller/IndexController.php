@@ -13,6 +13,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Zend\Session\Container;
 use Zend\View\Model\JsonModel;
+use Zend\Crypt\Password\Bcrypt;
 
 use \Exception;
 
@@ -20,11 +21,21 @@ class IndexController extends AbstractActionController
 {
     private $_sessionContainer;
     private $_view;
+    private $_model;
 
     public function __construct()
     {
         $this->_sessionContainer = new Container('Checkup');
         $this_view = new ViewModel();
+        
+    }
+
+    private function _getTable()
+    {
+        $serviceLocator = $this->getServiceLocator();
+        $model = $serviceLocator->get('Application\Model\Model');
+
+        return $model;
     }
 
     public function indexAction()
@@ -67,16 +78,64 @@ class IndexController extends AbstractActionController
                 $this->NoCSRF()->check( 'token', $postData, true, 60*10, false);
 
 
-                if($postData['username'] == 'admin' && $postData['password'] == 'admin')
+                $username = $postData['username'];
+                $password = $postData['password'];
+                
+                $model = $this->_getTable();
+                $users = $model->get('Users');
+                $result = $users->getUserAccount($username);
+
+                if(!empty($result))
                 {
-                    $this->_sessionContainer->user_id = '123';
+                    $securePassword = $result['password'];
+
+                    $bcrypt = new Bcrypt();
+
+                    if ($bcrypt->verify($password, $securePassword))
+                    {
+                        $users->logUserLastLogin($result['user_id']);
+
+                        $this->_sessionContainer->user_id = $result['user_id'];
+                        $this->_sessionContainer->user_fName = $result['fName'];
+                        $this->_sessionContainer->user_lName = $result['lName'];
+
+                        
+                    } 
+                    else 
+                    {
+                        $retVal = array(
+                            "success" => false,
+                            "errorMessage" => "Invalid username/password",
+                            "redirect" => "/"
+                        );
+                    }
                 }
+                else
+                {
+                    $retVal = array(
+                        "success" => false,
+                        "errorMessage" => "Invalid username/password",
+                        "redirect" => "/"
+                    );
+                }
+                
             } 
             catch(\Exception $e) 
             {
+                $errorMessage = 'Invalid username/password';
+                if(strpos($e->getMessage(), 'password') !== false)
+                {
+                    $errorMessage = 'Invalid username/password';
+                }
+
+                if(strpos(strtolower($e->getMessage()), 'csrf') !== false)
+                {
+                    $errorMessage = 'Invalid request source';
+                }
+
                 $retVal = array(
                     "success" => false,
-                    "errorMessage" => "Invalid request source",
+                    "errorMessage" => $errorMessage,
                     "redirect" => "/"
                 );
             }
@@ -108,7 +167,7 @@ class IndexController extends AbstractActionController
             $postData = $request->getPost(); 
             $this->NoCSRF()->check( 'token', $postData, true, 60*10, false);
 
-            session_destroy();
+            $this->_sessionContainer->getManager()->destroy();
 
         } 
         catch(\Exception $e) 

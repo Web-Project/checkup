@@ -6,6 +6,8 @@ use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Sql;
 use Zend\Db\Sql\Select;
 use Zend\Db\Sql\Update;
+use Zend\Db\Sql\Insert;
+use Zend\Db\Sql\Delete;
 
 class Table
 {
@@ -39,13 +41,36 @@ class Table
         return new Select($tableName);
     }
 
-    public function update($tableName, $setClause, $whereClause)
+    public function update($tableName = null, $setClause, $whereClause)
     {
         $update = new Update($tableName);
         
         $update->set($setClause)
                 ->where($whereClause);
         $statement = $this->_sql->prepareStatementForSqlObject($update);
+        $result = $statement->execute();
+
+        return $result->count();
+    }
+
+    public function insert($tableName = null, $data)
+    {
+        $insert = new Insert($tableName);
+        $insert->columns(array_keys($data))
+                ->values($data);
+
+        $statement = $this->_sql->prepareStatementForSqlObject($insert);
+        $result = $statement->execute();
+
+        return $result->count();
+    }
+
+    public function delete($tableName = null, $whereClause)
+    {
+        $delete = new Delete($tableName);
+        $delete->where($whereClause);
+
+        $statement = $this->_sql->prepareStatementForSqlObject($delete);
         $result = $statement->execute();
 
         return $result->count();

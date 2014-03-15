@@ -1,62 +1,39 @@
 <?php
-/**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/ZendSkeletonApplication for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
- */
-
 namespace Application\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
-use Zend\Session\Container;
+use Application\Controller\Controller;
+
+
 use Zend\View\Model\JsonModel;
 use Zend\Crypt\Password\Bcrypt;
 
 use \Exception;
 
-class IndexController extends AbstractActionController
+class IndexController extends Controller
 {
-    private $_sessionContainer;
-    private $_view;
-    private $_model;
-
-    public function __construct()
-    {
-        $this->_sessionContainer = new Container('Checkup');
-        $this_view = new ViewModel();
-        
-    }
-
-    private function _getTable()
-    {
-        $serviceLocator = $this->getServiceLocator();
-        $model = $serviceLocator->get('Application\Model\Model');
-
-        return $model;
-    }
 
     public function indexAction()
     {
         $token  = $this->NoCSRF()->generate('token');
         if(empty($this->_sessionContainer->user_id))
         {
-            $view = new ViewModel(
+            $this->_view->setVariables(
                 array(
                     'token' => $token
                 )
             );
-            $view->setTemplate('application/index/login');
+            
+            $this->_view->setTemplate('application/index/login');
 
-            return $view;
+            return $this->_view;
         }
 
-        return new ViewModel(
+        $this->_view->setVariables(
             array(
                 'token' => $token
-            ));
+            )
+        );
+        return $this->_view;
     }
 
     public function loginAction()
@@ -81,31 +58,62 @@ class IndexController extends AbstractActionController
                 $username = $postData['username'];
                 $password = $postData['password'];
                 
-                $model = $this->_getTable();
-                $users = $model->get('Users');
+                
+                $users = $this->model('Users');
                 $result = $users->getUserAccount($username);
 
+                //check if username existed
                 if(!empty($result))
                 {
                     $securePassword = $result['password'];
 
                     $bcrypt = new Bcrypt();
 
+                    //get password and verify if equal
                     if ($bcrypt->verify($password, $securePassword))
                     {
-                        $users->logUserLastLogin($result['user_id']);
 
-                        $this->_sessionContainer->user_id = $result['user_id'];
-                        $this->_sessionContainer->user_fName = $result['fName'];
-                        $this->_sessionContainer->user_lName = $result['lName'];
+                        //check if account is active
 
+                        if(strcasecmp(strtolower(trim($result['deactivated'])), 'Y') == 0)
+                        {
+                            $retVal = array(
+                                "success" => false,
+                                "errorMessage" => "Account has been deactivated",
+                                "redirect" => "/"
+                            );
+                        }
+                        else
+                        {
+                            $users->logUserLastLogin($result['user_id']);
+
+                            $terminal = $this->model('Terminal');
+                            $terminalResult = $terminal->getTerminalId();
+
+                            if(empty($terminalResult))
+                            {
+                                $retVal = array(
+                                    "success" => false,
+                                    "errorMessage" => "Terminal ID not found",
+                                    "redirect" => "/"
+                                );
+                            }
+                            else
+                            {
+                                $this->_sessionContainer->user_id = $result['user_id'];
+                                $this->_sessionContainer->user_fName = $result['fName'];
+                                $this->_sessionContainer->user_lName = $result['lName'];
+                                $this->_sessionContainer->user_role = $result['role'];
+                                $this->_sessionContainer->terminal_id = $terminalResult['terminalId'];
+                            }
+                        }
                         
                     } 
                     else 
                     {
                         $retVal = array(
                             "success" => false,
-                            "errorMessage" => "Invalid username/password",
+                            "errorMessage" => "Invalid password",
                             "redirect" => "/"
                         );
                     }
@@ -135,7 +143,7 @@ class IndexController extends AbstractActionController
 
                 $retVal = array(
                     "success" => false,
-                    "errorMessage" => $errorMessage,
+                    "errorMessage" => $errorMessage . '. ' . $e->getMessage(),
                     "redirect" => "/"
                 );
             }

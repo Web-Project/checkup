@@ -1,6 +1,28 @@
 (function(){
 
+    Ext.namespace('Checkup.Windows');
     var token;
+    Checkup.Windows.openedWindows = [];
+
+    function menuHandler(btn)
+    {
+
+        var btnId = btn.id;
+        var btnIdArr = btnId.split('-');
+
+        btnIdArr[btnIdArr.length - 1] = btnIdArr[btnIdArr.length - 1] + '.Window.' + btnIdArr[btnIdArr.length - 1];
+
+        var windowPath = btnIdArr.join('.');
+
+
+        if(Checkup.Windows.openedWindows.indexOf('Checkup.' + windowPath) ==-1)
+        {
+            Checkup.Windows.openedWindows.push('Checkup.' + windowPath);
+
+            var win = Ext.create('Checkup.' + windowPath);
+            win.show();
+        }
+    }
 
     var menu_bar = [
         {
@@ -9,16 +31,8 @@
             menu    : {
                 items   : [
                     {
-                        text    : 'Menu 1',
-                        menu    : {
-                            items   : [
-                                {
-                                    text    : 'Submenu'
-                                }
-                            ]
-                        }
-                    }, {
-                        text    : 'Menu 2'
+                        text    : 'Logout',
+                        handler : logout
                     }
                 ]
             }
@@ -33,7 +47,18 @@
                         menu    : {
                             items   : [
                                 {
-                                    text    : 'Submenu'
+                                    text    : 'Users',
+                                    id      : 'Administration-Users',
+                                    handler : menuHandler
+                                }, {
+                                    text    : 'Setup',
+                                    menu    : {
+                                        items   : [
+                                            {
+                                                text    : 'Warehouse'
+                                            }
+                                        ]
+                                    }
                                 }
                             ]
                         }
@@ -42,7 +67,9 @@
                         menu    : {
                             items   : [
                                 {
-                                    text    : 'Submenu'
+                                    text    : 'A/R Invoice'
+                                }, {
+                                    text    : 'Sales Return'
                                 }
                             ]
                         }
@@ -51,7 +78,9 @@
                         menu    : {
                             items   : [
                                 {
-                                    text    : 'Submenu'
+                                    text    : 'Puchase Order'
+                                }, {
+                                    text    : 'Goods Receipt PO'
                                 }
                             ]
                         }
@@ -60,7 +89,7 @@
                         menu    : {
                             items   : [
                                 {
-                                    text    : 'Submenu'
+                                    text    : 'Business Partners'
                                 }
                             ]
                         }
@@ -71,13 +100,11 @@
                                 {
                                     text    : 'Item Master Data'
                                 }, {
-                                    text    : 'Inventory Transaction',
+                                    text    : 'Inventory Transactions',
                                     menu    : {
                                         items   : [
                                             {
-                                                text : 'Goods Receipt'
-                                            }, {
-                                                text : 'Goods Issued'
+                                                text : 'Goods Return'
                                             }, {
                                                 text : 'Inventory Transfer'
                                             }
@@ -96,7 +123,7 @@
             }
         }, {
             xtype   : 'button',
-            text    : 'Windows',
+            text    : 'Windows'/*,
             menu    : {
                 items   : [
                     {
@@ -112,7 +139,7 @@
                         text    : 'Menu 2'
                     }
                 ]
-            }
+            }*/
         }
     ];
 
@@ -145,6 +172,7 @@
         id          : 'panel-main',
         layout      : 'column',
         iconCls     : 'default-icon',
+        height      : Ext.getBody().getViewSize().height,
 
 
         border  : false,

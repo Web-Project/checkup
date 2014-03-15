@@ -8,13 +8,9 @@
 		title 		: 'Users',
 		id 			: 'window-users',
 
-		renderTo 	: Ext.get('container'),
 		layout 		: 'fit',
 
 		resizable 	: false,
-		//modal 		: true,
-		minimizable	: true,
-		maximizable : true,
 
 		initComponent : function(){
 			

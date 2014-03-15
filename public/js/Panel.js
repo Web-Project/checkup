@@ -10,18 +10,24 @@
         var btnId = btn.id;
         var btnIdArr = btnId.split('-');
 
-        btnIdArr[btnIdArr.length - 1] = btnIdArr[btnIdArr.length - 1] + '.Window.' + btnIdArr[btnIdArr.length - 1];
+        btnIdArr[btnIdArr.length - 1] = btnIdArr[btnIdArr.length - 1] + '.Form.' + btnIdArr[btnIdArr.length - 1];
 
         var windowPath = btnIdArr.join('.');
 
 
-        if(Checkup.Windows.openedWindows.indexOf('Checkup.' + windowPath) ==-1)
+        /*if(Checkup.Windows.openedWindows.indexOf('Checkup.' + windowPath) ==-1)
         {
-            Checkup.Windows.openedWindows.push('Checkup.' + windowPath);
+            Checkup.Windows.openedWindows.push('Checkup.' + windowPath);*/
 
-            var win = Ext.create('Checkup.' + windowPath);
-            win.show();
-        }
+            Ext.get('panel-main-body').update('');
+            var win = Ext.create('Checkup.' + windowPath, {
+                renderTo     : 'panel-main-body',
+                style       : 'margin: auto; top:20px;',
+                id          : btn.id + '-panel',
+                frame       : false,
+            });
+            //win.show();
+        /*}*/
     }
 
     var menu_bar = [
@@ -55,7 +61,9 @@
                                     menu    : {
                                         items   : [
                                             {
-                                                text    : 'Warehouse'
+                                                text    : 'Warehouse',
+                                                id      : 'Administration-Setup-Warehouse',
+                                                handler : menuHandler
                                             }
                                         ]
                                     }
@@ -67,7 +75,9 @@
                         menu    : {
                             items   : [
                                 {
-                                    text    : 'A/R Invoice'
+                                    text    : 'A/R Invoice',
+                                    id      : 'Sales-ARInvoice',
+                                    handler : menuHandler
                                 }, {
                                     text    : 'Sales Return'
                                 }
@@ -168,11 +178,12 @@
     {
         extend      : 'Ext.panel.Panel',
         title       : 'Checkout Motor Parts Admin Panel',
-        renderTo    : Ext.get('container'),
+        renderTo    : Ext.getBody(),
         id          : 'panel-main',
-        layout      : 'column',
+        layout      : 'fit',
         iconCls     : 'default-icon',
         height      : Ext.getBody().getViewSize().height,
+        style       : 'overflow : hidden !important',
 
 
         border  : false,
@@ -196,6 +207,14 @@
                     handler: logout
                 }
             ];
+
+            this.items = [
+                {
+                    xtype   : 'panel',
+                    border  : true,
+                    id      : 'checkup-container'
+                }
+            ]
             this.superclass.initComponent.call(this);
         },
 

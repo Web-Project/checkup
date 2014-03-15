@@ -48,6 +48,10 @@ class Table
         $update->set($setClause)
                 ->where($whereClause);
         $statement = $this->_sql->prepareStatementForSqlObject($update);
+
+        $string = $this->_sql->getSqlStringForSqlObject($update);
+
+        //echo $string;
         $result = $statement->execute();
 
         return $result->count();

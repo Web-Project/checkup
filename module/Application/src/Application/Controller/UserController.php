@@ -43,6 +43,7 @@ class UserController extends Controller
         $data = array();
         $retVal = array();
         $file_temp = "";
+        $new_path = null;
 
         $request = $this->getRequest();
 
@@ -100,6 +101,7 @@ class UserController extends Controller
                 $bcrypt = new Bcrypt();
                 $securePass = $bcrypt->create($password);
 
+
                 if(!empty($photo))
                 {
                     $new_path = move_uploaded_file($file_temp,  ROOTH_PATH . "/public/img/userPic/" . $photo);
@@ -123,7 +125,7 @@ class UserController extends Controller
                         'role'      => $role
                     );
 
-                    if (empty($new_path)) 
+                    if (empty($new_path) && !empty($photo)) 
                     {
                         $retVal = array(
                             'success'       => false,
@@ -145,7 +147,7 @@ class UserController extends Controller
                         {
                             $retVal = array(
                                 'success'       => true,
-                                'errorMessage' => 'New user added successfully'
+                                'message' => 'New user added successfully'
                             );
                         }
                     }
@@ -197,7 +199,7 @@ class UserController extends Controller
                         {
                             $retVal = array(
                                 'success'       => true,
-                                'errorMessage' => 'User updated successfully'
+                                'message' => 'User updated successfully'
                             );
                         }
                     }

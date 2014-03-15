@@ -74,7 +74,10 @@ return array(
     'controllers' => array(
         'invokables' => array(
             'Application\Controller\Index' => 'Application\Controller\IndexController',
-            'Application\Controller\User' => 'Application\Controller\UserController'
+            'Application\Controller\User' => 'Application\Controller\UserController',
+            'Application\Controller\Warehouse' => 'Application\Controller\WarehouseController',
+            'Application\Controller\BusinessPartner' => 'Application\Controller\BusinessPartnerController',
+            'Application\Controller\SalesInvoice' => 'Application\Controller\SalesInvoiceController'
         ),
     ),
     'controller_plugins' => array(

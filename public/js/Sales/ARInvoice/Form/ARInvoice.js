@@ -1,38 +1,28 @@
 (function(){
 	var me, origUsername, finalUsername;
-	var url = 'application/user/getUsers',
+	var businessPartnerStoreUrl = 'application/BusinessPartner',
+		salesInvoiceStoreUrl = 'application/SalesInvoice',
 		submit_url = 'application/user/saveUser',
 		deleteUrl = 'application/user/deleteUser';
-	var userFields = [
-		'user_id', 'username', 'password', 'fName',
-		'midName', 'lName', 'email', 'address',
-		'gender', 'picLocation', 'deactivated',
-		'role'
+
+
+	var businessPartnerStoreFields = [
+		'code', 'BPName'
 	];
 
-	var genderStore = Ext.create('Ext.data.Store', {
-	    fields: ['code'],
-	    data : [
-	        {"code":"M"},
-	        {"code":"F"}
-	    ]
-	});
+	var salesInvoiceStoreFields = [
+		'id', 'docId', 'customerCode', 'customerName',
+		'postingDate', 'remarks1', 'remarks2', 
+		'totalDscntInPrcnt', 'totalDscntInAmt',
+		'netTotal', 'grossTotal'
+	];
 
-	var roleStore = Ext.create('Ext.data.Store', {
-	    fields: ['id', 'type'],
-	    data : [
-	        {'id' : "0", "type":"Superuser"},
-	        {'id' : "1", "type":"User"}
-	    ]
-	});
-
-	var usersStore = Ext.create('Ext.data.Store',
+	var businessPartnerStore = Ext.create('Ext.data.Store',
 	{
-		id 		: 'store-users',
+		id 		: 'store-businessPartnerStore',
 		proxy	: { 
-			url 			: url,
+			url 			: businessPartnerStoreUrl,
 			type 			: 'ajax',
-			extraParams  	: {m: "GetAllAppointmentTypes"},
 			actionMethods 	: 'POST',
 			reader 			: { 
 				type 			:'json',
@@ -44,10 +34,40 @@
 		},
 		
 		autoLoad: true ,
-	    fields: userFields
+	    fields: businessPartnerStoreFields
 	});
 
-	function populateFields(data)
+	var salesInvoiceStore = Ext.create('Ext.data.Store',
+	{
+		id 		: 'store-salesInvoiceStore',
+		proxy	: { 
+			url 			: salesInvoiceStoreUrl,
+			type 			: 'ajax',
+			actionMethods 	: 'POST',
+			reader 			: { 
+				type 			:'json',
+				root			: 'rows',
+				totalProperty	: 'totalRecords'
+			},
+
+			simpleSortMode: true
+		},
+		
+		autoLoad: true ,
+	    fields: salesInvoiceStoreFields
+	});
+
+	function getCurrentDate()
+	{
+		var date = new Date();
+		var day = date.getDate();
+		var year = date.getFullYear();
+		var month = date.getMonth() + 1
+
+		return year + '-' + month + '-' + day;
+	}
+
+	/*function populateFields(data)
 	{
 		Ext.getCmp('user_id').setValue(data.user_id);
 		Ext.getCmp('txt-username-users').setValue(data.username);
@@ -78,18 +98,19 @@
 		}
 
 		origUsername = data.username;
-	}
+	}*/
 
-	Ext.define('Checkup.Administration.Users.Form.Users',
+	Ext.define('Checkup.Sales.ARInvoice.Form.ARInvoice',
 	{
 		extend 		: 'Ext.form.Panel',
 
 
 		layout 		: 'column',
+		
 		border 		: true,
-		width 		: 940,
-		height 		: 340,
-		title 		: 'Users',
+		title 		: 'Sales - A/R Invoice',
+		//style 		: 'top : 0px !important',
+		width 		: '90%',
 
 		defaultType : 'textfield',
 
@@ -101,6 +122,156 @@
 
 		items 		: [
 			{
+				xtype 	: 'panel',
+				columnWidth : 1,
+				layout 	: 'column',
+				border  : false,
+				items 	: [
+					{
+						xtype 	: 'fieldset',
+						title 	: 'Sales Invoice Information',
+						width 	: 420,
+						height 	: 426,
+						layout 	: 'column',
+						margin 	: '3 5 0 10',
+						items 	: [
+							{
+								xtype 		: 'textfield',
+								fieldLabel 	: 'Sales Invoice #',
+								readOnly 	: true,
+								name 		: 'salesInvoidId',
+								id 			: 'txt-salesInvoiceId-salesInvoice',
+								columnWidth	: 1,
+								margin 		: '5 0 0 0'
+							}, {
+								xtype 		: 'textfield',
+								fieldLabel 	: 'Posting Date',
+								readOnly 	: true,
+								name 		: 'postingDate',
+								id 			: 'txt-postingDate-salesInvoice',
+								columnWidth	: 1,
+								margin 		: '5 0 0 0',
+								value 		: getCurrentDate()
+							}, {
+								xtype 		: 'combo',
+								fieldLabel 	: 'Customer Code',
+								columnWidth : 1,
+								name 		: 'customerCode',
+								id 			: 'cbo-customerCode-salesInvoice',
+								queryMode 	: 'local',
+								triggerAction: 'all',
+								forceSelection:false,
+								displayField: 'code',
+								valueField 	: 'code',
+								columnWidth	: 1,
+								store 		: businessPartnerStore,
+								margin 		: '5 0 0 0',
+								allowBlank 	: false
+							}, {
+								xtype 		: 'combo',
+								fieldLabel 	: 'Customer Name',
+								columnWidth : 1,
+								name 		: 'customerName',
+								id 			: 'cbo-customerName-salesInvoice',
+								queryMode 	: 'local',
+								triggerAction: 'all',
+								forceSelection:false,
+								displayField: 'BPName',
+								valueField 	: 'code',
+								columnWidth	: 1,
+								store 		: businessPartnerStore,
+								margin 		: '5 0 0 0',
+								allowBlank 	: false
+							}, {
+								xtype 		: 'textarea',
+								fieldLabel 	: 'Remarks 1',
+								columnWidth : 1,
+								name 		: 'remarks1',
+								id 			: 'txtarea-remarks1-salesInvoice',
+								margin 		: '5 0 0 0'
+							}, {
+								xtype 		: 'textarea',
+								fieldLabel 	: 'Remarks 2',
+								columnWidth : 1,
+								name 		: 'remarks2',
+								id 			: 'txtarea-remarks2-salesInvoice',
+								margin 		: '5 0 0 0'
+							}, {
+								xtype 		: 'textfield',
+								fieldLabel 	: 'Total Discount %',
+								readOnly 	: true,
+								name 		: 'totalDscntInPrcnt',
+								id 			: 'txt-totalDscntInPrcnt-salesInvoice',
+								columnWidth	: 1,
+								margin 		: '5 0 0 0'
+							}, {
+								xtype 		: 'textfield',
+								fieldLabel 	: 'Total Discount Amt',
+								readOnly 	: true,
+								name 		: 'totalDscntInAmt',
+								id 			: 'txt-totalDscntInAmt-salesInvoice',
+								columnWidth	: 1
+							}, {
+								xtype 		: 'textfield',
+								fieldLabel 	: 'Net Total',
+								readOnly 	: true,
+								name 		: 'netTotal',
+								id 			: 'txt-netTotal-salesInvoice',
+								columnWidth	: 1
+							}, {
+								xtype 		: 'textfield',
+								fieldLabel 	: 'Gross Total',
+								readOnly 	: true,
+								name 		: 'grossTotal',
+								id 			: 'txt-grossTotal-salesInvoice',
+								columnWidth	: 1,
+								margin 		: '5 0 10 0'
+							}
+						]
+					}, {
+						xtype 	: 'grid',
+						id 		: 'grid-salesInvoiceList-salesInvoice',
+						store 	: businessPartnerStore,
+						columnWidth: 1,
+						height 	: 420,
+						width 	: 500,
+						margin 	: '10 10 10 5',
+						columns : [
+							{text : 'Sales Invoice ID', 	dataIndex : 'docId',	flex : 1},
+							{text : 'Customer Code', 	dataIndex : 'customerCode',	flex : 1},
+							{text : 'Customer Name', 	dataIndex : 'customerName',	flex : 1},
+							{text : 'Posting Date', 	dataIndex : 'postingDate',	flex : 1},
+							{text : 'Remarks 1', 	dataIndex : 'remarks1',	flex : 1},
+							{text : 'Remakrs 2', 	dataIndex : 'remarks2',	flex : 1},
+							{text : 'Total Discount %', 	dataIndex : 'totalDscntInPrcnt',	flex : 1},
+							{text : 'Total Discount Amt', 	dataIndex : 'totalDscntInAmt',	flex : 1},
+							{text : 'Net Total', 	dataIndex : 'netTotal',	flex : 1},
+							{text : 'Gross Total', 	dataIndex : 'grossTotal',	flex : 1}
+						]
+					}
+				]
+			}, {
+				xtype 	: 'grid',
+				title 	: 'Items',
+				id 		: 'grid-salesInvoiceItems-salesInvoice',
+				store 	: businessPartnerStore,
+				columnWidth: 1,
+				height 	: 200,
+				margin 	: '0 10 10 5',
+				columns : [
+					{text : 'Sales Invoice ID', 	dataIndex : 'docId',	flex : 1},
+					{text : 'Customer Code', 	dataIndex : 'customerCode',	flex : 1},
+					{text : 'Customer Name', 	dataIndex : 'customerName',	flex : 1},
+					{text : 'Posting Date', 	dataIndex : 'postingDate',	flex : 1},
+					{text : 'Remarks 1', 	dataIndex : 'remarks1',	flex : 1},
+					{text : 'Remakrs 2', 	dataIndex : 'remarks2',	flex : 1},
+					{text : 'Total Discount %', 	dataIndex : 'totalDscntInPrcnt',	flex : 1},
+					{text : 'Total Discount Amt', 	dataIndex : 'totalDscntInAmt',	flex : 1},
+					{text : 'Net Total', 	dataIndex : 'netTotal',	flex : 1},
+					{text : 'Gross Total', 	dataIndex : 'grossTotal',	flex : 1}
+				]
+			}
+			/*{
 				xtype 	: 'grid',
 				id 		: 'grid-users-list',
 				width 	: 500,
@@ -129,7 +300,7 @@
 			}, {
 				xtype 	: 'fieldset',
 				title 	: 'User Information',
-				columnWidth 	: 1,
+				width 	: 410,
 				height 	: 265,
 				margin : '0 10 10 5',
 				layout 	: 'column',
@@ -267,21 +438,21 @@
 						]
 					}
 				]
-			}
+			}*/
 		],
 
 		buttons 	: [
 			{
 				text 	: 'New',
-				handler : function()
+				/*handler : function()
 				{
 					me.getForm().reset();
 					Ext.getCmp('txt-password').allowBlank = false;
 					Ext.getCmp('btn-delete-users').disable();
-				}
+				}*/
 			}, {
 				text 	: 'Save',
-				handler : function()
+				/*handler : function()
 				{
 					var form = me.getForm(),
 						usernameEdit = 0;
@@ -321,12 +492,12 @@
 						Ext.getCmp('img-user-picture').setSrc('');
 						Ext.getCmp('btn-delete-users').disable();
                     }
-				}
+				}*/
 			}, {
 				text 	: 'Delete',
-				id 		: 'btn-delete-users',
+				id 		: 'btn-delete-salesInvoice',
 				disabled: true,
-				handler : function()
+				/*handler : function()
 				{
 					var grid = Ext.getCmp('grid-users-list');
 					var selectionModel = grid.getSelectionModel();
@@ -372,12 +543,11 @@
 					{
 						Ext.Msg.alert('Delete', 'Please select a row to delete');
 					}
-				}
+				}*/
 			}, {
 				text 	: 'Close',
 				handler : function()
 				{
-					Ext.getCmp('img-user-picture').setSrc('');
 					me.getForm().reset();
 					me.up('window').close();
 				}
@@ -385,80 +555,5 @@
 		]
 
 	});
-
-	function abortRead() {
-		reader.abort();
-	}
-
-	function errorHandler(evt) {
-		switch(evt.target.error.code) {
-		  	case evt.target.error.NOT_FOUND_ERR:
-		    	alert('File Not Found!');
-		    	break;
-		  	case evt.target.error.NOT_READABLE_ERR:
-		    	alert('File is not readable');
-		    	break;
-		  	case evt.target.error.ABORT_ERR:
-		    	break; // noop
-		  	default:
-		  	  	alert('An error occurred reading this file.');
-		};
-	}
-
-	function updateProgress(evt) {
-		// evt is an ProgressEvent.
-		if (evt.lengthComputable) {
-
-			var percentLoaded = Math.round((evt.loaded / evt.total) * 100);
-			// Increase the progress bar length.
-			if (percentLoaded < 100) {
-				progress.style.width = percentLoaded + '%';
-				progress.textContent = percentLoaded + '%';
-
-			}
-		}
-	}
-
-	function handleFileSelect(sourceID, targetID) {
-		// Reset progress indicator on new file selection.
-
-
-	    var files = Ext.getCmp(sourceID).getEl().down('input[type=file]').dom.files;
-
-	    // Loop through the FileList and render image files as thumbnails.
-	    for (var i = 0, f; f = files[i]; i++) {
-
-	      	// Only process image files.
-	      	if (!f.type.match('image.*')) {
-	        	alert('Invalid image');
-	      	}
-
-	      	reader = new FileReader();
-
-	      	reader.onerror = errorHandler;
-	    	reader.onprogress = updateProgress;
-	    	reader.onabort = function(e) {
-	      		alert('File read cancelled');
-	    	};
-			reader.onloadstart = function(e) {
-	      		//document.getElementById('progress_bar').className = 'loading';
-	    	};
-	    	//$('#overlap').val(f.name);
-
-	    	reader.onload = function(e){
-	    		/*progress.style.width = '100%';
-	  			progress.textContent = '100%';*/
-	  			
-	 			setTimeout(function(){hideProgressBar(e, targetID)}, 2000);
-	    	}
-
-	      // Read in the image file as a data URL.
-	      reader.readAsDataURL(f);
-	    }
-	}
-
-	function hideProgressBar(e, targetID){
-		Ext.getCmp(targetID).setSrc(e.target.result);
-	}
 
 })();

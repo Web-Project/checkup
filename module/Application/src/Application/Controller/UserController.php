@@ -102,23 +102,7 @@ class UserController extends Controller
 
                 if(!empty($photo))
                 {
-                    /*$currentDir = dirname(__FILE__);
-
-                    echo $currentDir;
-                    $new_path = move_uploaded_file($file_temp, "/img/userPic" . $photo);*/
-                    $renderer = $this->serviceLocator->get('Zend\View\Renderer\RendererInterface');
-                    $url = $renderer->basePath();
-
-                    /*$filter = new \Zend\Filter\File\Rename(array(
-                        "target"    => $url . "/img/userPic/" . $photo,
-                        "randomize" => true,
-                    ));
-                    $new_path =  $filter->filter($fileData['img-photo']);*/
-
                     $new_path = move_uploaded_file($file_temp,  ROOTH_PATH . "/public/img/userPic/" . $photo);
-
-
-                    
                 }
 
 

@@ -60,6 +60,9 @@ class Table
                 ->values($data);
 
         $statement = $this->_sql->prepareStatementForSqlObject($insert);
+        $string = $this->_sql->getSqlStringForSqlObject($insert);
+
+        //echo $string;
         $result = $statement->execute();
 
         return $result->count();

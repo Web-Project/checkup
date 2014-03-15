@@ -42,12 +42,14 @@ class UserController extends Controller
     {
         $data = array();
         $retVal = array();
+        $file_temp = "";
 
         $request = $this->getRequest();
 
         if ($request->isPost()) 
         {
             $postData = $request->getPost();
+            $fileData = $request->getFiles();
 
             $userId = (!empty($postData['user_id'])) ? $postData['user_id'] : 0;
             $username = (!empty($postData['username'])) ? $postData['username'] : '';
@@ -60,7 +62,22 @@ class UserController extends Controller
             $gender = (!empty($postData['gender'])) ? $postData['gender'] : '';
             $role = (!empty($postData['role'])) ? $postData['role'] : 0;
             $deactivate = (!empty($postData['deactivate'])) ? $postData['deactivate'] : '';
-            //$photo = (!empty($postData['photo'])) ? $postData['photo'] : '';
+            $photo = (!empty($fileData['img-photo'])) ? $fileData['img-photo'] : array();
+
+            if(!empty($photo['size']))
+            {
+                $file       = $photo;
+                $file_name  = $file["name"];
+                $file_temp  = $file["tmp_name"];
+                
+                $parts      = explode('.', $file_name);
+                $ext        = $parts[1];
+                $photo       = date('Y_m_d') . '_' . $username . '.' . $ext;
+            }
+            else
+            {
+                $photo = null;
+            }
             
             //check for duplicate username
             $users = $this->model('Users');
@@ -83,6 +100,28 @@ class UserController extends Controller
                 $bcrypt = new Bcrypt();
                 $securePass = $bcrypt->create($password);
 
+                if(!empty($photo))
+                {
+                    /*$currentDir = dirname(__FILE__);
+
+                    echo $currentDir;
+                    $new_path = move_uploaded_file($file_temp, "/img/userPic" . $photo);*/
+                    $renderer = $this->serviceLocator->get('Zend\View\Renderer\RendererInterface');
+                    $url = $renderer->basePath();
+
+                    /*$filter = new \Zend\Filter\File\Rename(array(
+                        "target"    => $url . "/img/userPic/" . $photo,
+                        "randomize" => true,
+                    ));
+                    $new_path =  $filter->filter($fileData['img-photo']);*/
+
+                    $new_path = move_uploaded_file($file_temp,  ROOTH_PATH . "/public/img/userPic/" . $photo);
+
+
+                    
+                }
+
+
                 if(empty($userId))
                 {
                     $data = array(
@@ -95,27 +134,36 @@ class UserController extends Controller
                         'address'   => $address,
                         'gender'    => $gender,
                         'createDate'=> date('Y-m-d H:i:s'),
-                        'picLocation'=> '',
+                        'picLocation'=> $photo,
                         'deactivated'=> ($deactivate)? 'Y' :'N',
                         'role'      => $role
                     );
 
-
-                    $affected_rows = $users->addUser($data);
-
-                    if(empty($affected_rows))
+                    if (empty($new_path)) 
                     {
                         $retVal = array(
                             'success'       => false,
-                            'errorMessage' => 'Adding new user failed'
+                            'errorMessage' => 'Error uploading photo'
                         );
                     }
                     else
                     {
-                        $retVal = array(
-                            'success'       => true,
-                            'errorMessage' => 'New user added successfully'
-                        );
+                        $affected_rows = $users->addUser($data);
+
+                        if(empty($affected_rows))
+                        {
+                            $retVal = array(
+                                'success'       => false,
+                                'errorMessage' => 'Adding new user failed'
+                            );
+                        }
+                        else
+                        {
+                            $retVal = array(
+                                'success'       => true,
+                                'errorMessage' => 'New user added successfully'
+                            );
+                        }
                     }
                 }
                 else
@@ -129,31 +177,45 @@ class UserController extends Controller
                         'address'   => $address,
                         'gender'    => $gender,
                         'updateDate'=> date('Y-m-d H:i:s'),
-                        'picLocation'=> '',
                         'deactivated'=> ($deactivate)? 'Y' :'N',
                         'role'      => $role
                     );
+
+                    if(!empty($photo))
+                    {
+                        $data['picLocation'] = $photo;
+                    }
 
                     if(!empty($password))
                     {
                         $data['password'] = $securePass;
                     }
 
-                    $affected_rows = $users->updateUser($data, $userId);
-
-                    if(empty($affected_rows))
+                    if (empty($new_path) && !empty($photo)) 
                     {
-                         $retVal = array(
+                        $retVal = array(
                             'success'       => false,
-                            'errorMessage' => 'Updating user failed'
+                            'errorMessage' => 'Error uploading photo'
                         );
                     }
                     else
                     {
-                        $retVal = array(
-                            'success'       => true,
-                            'errorMessage' => 'User updated successfully'
-                        );
+                        $affected_rows = $users->updateUser($data, $userId);
+
+                        if(empty($affected_rows))
+                        {
+                             $retVal = array(
+                                'success'       => false,
+                                'errorMessage' => 'Updating user failed'
+                            );
+                        }
+                        else
+                        {
+                            $retVal = array(
+                                'success'       => true,
+                                'errorMessage' => 'User updated successfully'
+                            );
+                        }
                     }
                 }
             }

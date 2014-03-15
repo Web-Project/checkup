@@ -13,7 +13,7 @@
  * to the application root now.
  */
 chdir(dirname(__DIR__));
-//echo dirname(__DIR__);
+define('ROOTH_PATH', dirname(__DIR__)) ;
 set_include_path(get_include_path() . PATH_SEPARATOR . dirname(__DIR__));
 //echo get_include_path();
 // Decline static file requests back to the PHP built-in webserver

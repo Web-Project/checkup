@@ -58,7 +58,7 @@
 		Ext.getCmp('txt-address').setValue(data.address);
 		Ext.getCmp('cbo-gender').setValue(data.gender);
 		Ext.getCmp('cbo-role').setValue(data.role);
-		Ext.getCmp('img-photo').setSrc(data.picLocation);
+		Ext.getCmp('img-user-picture').setSrc( '/img/userPic/' + data.picLocation);
 
 		if(data.deactivated == 'Y')
 		{
@@ -161,13 +161,37 @@
 									}
 								]
 							}, {
-								xtype 		: 'image',
-								id 			: 'img-photo',
+								xtype 		: 'panel',
+								layout 		: 'vbox',
 								width 		: 130,
 								height 		: 130,
 								margin 		: '0 0 0 10',
-								style 		: 'border : 1px solid #CCC',
-								src 		: 'http://www.sencha.com/img/20110215-feat-html5.png'
+								border 		: false,
+								items 		: [
+									{
+										xtype 		: 'image',
+										width 		: 130,
+										height 		: 98,
+										style 		: 'border : 1px solid #CCC',
+										id 			: 'img-user-picture',
+										src 		: 'http://www.sencha.com/img/20110215-feat-html5.png'
+									}, {
+										xtype 		: 'filefield',
+										width 		: 130,
+										margin 		: '10 0 0 0',
+										id 			: 'img-photo',
+										name 		: 'img-photo',
+										emptyText 	: 'Select Photo',
+										buttonText 	: 'Upload',
+										listeners 	: {
+
+                                        	'change' 	: function(obj, value, opts) {
+
+                                        		handleFileSelect('img-photo', 'img-user-picture');
+                                        	}
+                                        }
+									}
+								]
 							}
 						]
 					}, {
@@ -204,7 +228,8 @@
 							    valueField 	: 'code',
 							    forceSelection : false,
 							    triggerAction : 'all',
-							    margin 		: '5 0 0 0'
+							    margin 		: '5 0 0 0',
+							    allowBlank 	: false
 							}, {
 								xtype 		: 'checkbox',
 								boxLabel 	: 'Deactivate',
@@ -279,6 +304,7 @@
                             }
                         });
 
+						Ext.getCmp('img-user-picture').setSrc('');
 						Ext.getCmp('btn-delete').disable();
                     }
 				}
@@ -323,6 +349,7 @@
 								});
 
 								Ext.getCmp('btn-delete').disable();
+								Ext.getCmp('img-user-picture').setSrc('');
 							}
 						});
 					}
@@ -335,6 +362,7 @@
 				text 	: 'Close',
 				handler : function()
 				{
+					Ext.getCmp('img-user-picture').setSrc('');
 					me.getForm().reset();
 					me.up('window').close();
 				}
@@ -342,5 +370,80 @@
 		]
 
 	});
+
+	function abortRead() {
+		reader.abort();
+	}
+
+	function errorHandler(evt) {
+		switch(evt.target.error.code) {
+		  	case evt.target.error.NOT_FOUND_ERR:
+		    	alert('File Not Found!');
+		    	break;
+		  	case evt.target.error.NOT_READABLE_ERR:
+		    	alert('File is not readable');
+		    	break;
+		  	case evt.target.error.ABORT_ERR:
+		    	break; // noop
+		  	default:
+		  	  	alert('An error occurred reading this file.');
+		};
+	}
+
+	function updateProgress(evt) {
+		// evt is an ProgressEvent.
+		if (evt.lengthComputable) {
+
+			var percentLoaded = Math.round((evt.loaded / evt.total) * 100);
+			// Increase the progress bar length.
+			if (percentLoaded < 100) {
+				progress.style.width = percentLoaded + '%';
+				progress.textContent = percentLoaded + '%';
+
+			}
+		}
+	}
+
+	function handleFileSelect(sourceID, targetID) {
+		// Reset progress indicator on new file selection.
+
+
+	    var files = Ext.getCmp(sourceID).getEl().down('input[type=file]').dom.files;
+
+	    // Loop through the FileList and render image files as thumbnails.
+	    for (var i = 0, f; f = files[i]; i++) {
+
+	      	// Only process image files.
+	      	if (!f.type.match('image.*')) {
+	        	alert('Invalid image');
+	      	}
+
+	      	reader = new FileReader();
+
+	      	reader.onerror = errorHandler;
+	    	reader.onprogress = updateProgress;
+	    	reader.onabort = function(e) {
+	      		alert('File read cancelled');
+	    	};
+			reader.onloadstart = function(e) {
+	      		//document.getElementById('progress_bar').className = 'loading';
+	    	};
+	    	//$('#overlap').val(f.name);
+
+	    	reader.onload = function(e){
+	    		/*progress.style.width = '100%';
+	  			progress.textContent = '100%';*/
+	  			
+	 			setTimeout(function(){hideProgressBar(e, targetID)}, 2000);
+	    	}
+
+	      // Read in the image file as a data URL.
+	      reader.readAsDataURL(f);
+	    }
+	}
+
+	function hideProgressBar(e, targetID){
+		Ext.getCmp(targetID).setSrc(e.target.result);
+	}
 
 })();

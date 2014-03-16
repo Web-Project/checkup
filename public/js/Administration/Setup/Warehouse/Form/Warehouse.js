@@ -10,18 +10,7 @@
 	var warehouseStore = Ext.create('Ext.data.Store',
 	{
 		id 		: 'store-warehouse-list',
-		proxy	: { 
-			url 			: url,
-			type 			: 'ajax',
-			actionMethods 	: 'POST',
-			reader 			: { 
-				type 			:'json',
-				root			: 'rows',
-				totalProperty	: 'totalRecords'
-			},
-
-			simpleSortMode: true
-		},
+		proxy	: proxy(url,{}),
 		
 		autoLoad: true ,
 	    fields: warehouseFields

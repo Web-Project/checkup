@@ -29,19 +29,7 @@
 	var usersStore = Ext.create('Ext.data.Store',
 	{
 		id 		: 'store-users',
-		proxy	: { 
-			url 			: url,
-			type 			: 'ajax',
-			extraParams  	: {m: "GetAllAppointmentTypes"},
-			actionMethods 	: 'POST',
-			reader 			: { 
-				type 			:'json',
-				root			: 'rows',
-				totalProperty	: 'totalRecords'
-			},
-
-			simpleSortMode: true
-		},
+		proxy	: proxy(url, {}),
 		
 		autoLoad: true ,
 	    fields: userFields

@@ -85,7 +85,7 @@
 		origUsername = data.username;
 	}*/
 
-	Ext.define('Checkup.Sales.ARInvoice.Form.ARInvoice',
+	Ext.define('Checkup.Purchasing.GRPO.Form.GRPO',
 	{
 		extend 		: 'Ext.form.Panel',
 
@@ -93,7 +93,7 @@
 		layout 		: 'column',
 		
 		border 		: true,
-		title 		: 'Sales - A/R Invoice',
+		title 		: 'Purchasing - Goods Receipt PO',
 		//style 		: 'top : 0px !important',
 		width 		: '90%',
 

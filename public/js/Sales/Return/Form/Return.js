@@ -36,7 +36,7 @@
 
 	var salesInvoiceStore = Ext.create('Ext.data.Store',
 	{
-		id 		: 'store-salesInvoiceStore',
+		id 		: 'store-salesReturnStore',
 		proxy	: proxy(salesInvoiceStoreUrl, {}),
 		autoLoad: true ,
 	    fields: salesInvoiceStoreFields
@@ -85,7 +85,7 @@
 		origUsername = data.username;
 	}*/
 
-	Ext.define('Checkup.Sales.ARInvoice.Form.ARInvoice',
+	Ext.define('Checkup.Sales.Return.Form.Return',
 	{
 		extend 		: 'Ext.form.Panel',
 
@@ -93,7 +93,7 @@
 		layout 		: 'column',
 		
 		border 		: true,
-		title 		: 'Sales - A/R Invoice',
+		title 		: 'Sales Return',
 		//style 		: 'top : 0px !important',
 		width 		: '90%',
 
@@ -114,7 +114,7 @@
 				items 	: [
 					{
 						xtype 	: 'fieldset',
-						title 	: 'Sales Invoice Information',
+						title 	: 'Sales Return Information',
 						width 	: 420,
 						height 	: 426,
 						layout 	: 'column',
@@ -122,10 +122,10 @@
 						items 	: [
 							{
 								xtype 		: 'textfield',
-								fieldLabel 	: 'Sales Invoice #',
+								fieldLabel 	: 'Sales Return #',
 								readOnly 	: true,
 								name 		: 'salesInvoidId',
-								id 			: 'txt-salesInvoiceId-salesInvoice',
+								id 			: 'txt-salesReturnId-salesReturn',
 								columnWidth	: 1,
 								margin 		: '5 0 0 0'
 							}, {
@@ -133,7 +133,7 @@
 								fieldLabel 	: 'Posting Date',
 								readOnly 	: true,
 								name 		: 'postingDate',
-								id 			: 'txt-postingDate-salesInvoice',
+								id 			: 'txt-postingDate-salesReturn',
 								columnWidth	: 1,
 								margin 		: '5 0 0 0',
 								value 		: getCurrentDate()
@@ -142,7 +142,7 @@
 								fieldLabel 	: 'Customer Code',
 								columnWidth : 1,
 								name 		: 'customerCode',
-								id 			: 'cbo-customerCode-salesInvoice',
+								id 			: 'cbo-customerCode-salesReturn',
 								queryMode 	: 'local',
 								triggerAction: 'all',
 								forceSelection:false,
@@ -157,7 +157,7 @@
 								fieldLabel 	: 'Customer Name',
 								columnWidth : 1,
 								name 		: 'customerName',
-								id 			: 'cbo-customerName-salesInvoice',
+								id 			: 'cbo-customerName-salesReturn',
 								queryMode 	: 'local',
 								triggerAction: 'all',
 								forceSelection:false,
@@ -172,21 +172,21 @@
 								fieldLabel 	: 'Remarks 1',
 								columnWidth : 1,
 								name 		: 'remarks1',
-								id 			: 'txtarea-remarks1-salesInvoice',
+								id 			: 'txtarea-remarks1-salesReturn',
 								margin 		: '5 0 0 0'
 							}, {
 								xtype 		: 'textarea',
 								fieldLabel 	: 'Remarks 2',
 								columnWidth : 1,
 								name 		: 'remarks2',
-								id 			: 'txtarea-remarks2-salesInvoice',
+								id 			: 'txtarea-remarks2-salesReturn',
 								margin 		: '5 0 0 0'
 							}, {
 								xtype 		: 'textfield',
 								fieldLabel 	: 'Total Discount %',
 								readOnly 	: true,
 								name 		: 'totalDscntInPrcnt',
-								id 			: 'txt-totalDscntInPrcnt-salesInvoice',
+								id 			: 'txt-totalDscntInPrcnt-salesReturn',
 								columnWidth	: 1,
 								margin 		: '5 0 0 0'
 							}, {
@@ -194,34 +194,34 @@
 								fieldLabel 	: 'Total Discount Amt',
 								readOnly 	: true,
 								name 		: 'totalDscntInAmt',
-								id 			: 'txt-totalDscntInAmt-salesInvoice',
+								id 			: 'txt-totalDscntInAmt-salesReturn',
 								columnWidth	: 1
 							}, {
 								xtype 		: 'textfield',
 								fieldLabel 	: 'Net Total',
 								readOnly 	: true,
 								name 		: 'netTotal',
-								id 			: 'txt-netTotal-salesInvoice',
+								id 			: 'txt-netTotal-salesReturn',
 								columnWidth	: 1
 							}, {
 								xtype 		: 'textfield',
 								fieldLabel 	: 'Gross Total',
 								readOnly 	: true,
 								name 		: 'grossTotal',
-								id 			: 'txt-grossTotal-salesInvoice',
+								id 			: 'txt-grossTotal-salesReturn',
 								columnWidth	: 1,
 								margin 		: '5 0 10 0'
 							}
 						]
 					}, {
 						xtype 	: 'grid',
-						id 		: 'grid-salesInvoiceList-salesInvoice',
+						id 		: 'grid-salesReturnList-salesReturn',
 						store 	: salesInvoiceStore,
 						columnWidth: 1,
 						height 	: 420,
 						margin 	: '10 10 10 5',
 						columns : [
-							{text : 'Sales Invoice ID', 	dataIndex : 'docId',	width : 88},
+							{text : 'Sales Return ID', 	dataIndex : 'docId',	width : 88},
 							{text : 'Customer Code', 	dataIndex : 'customerCode',	width : 86},
 							{text : 'Customer Name', 	dataIndex : 'customerName',	width : 159},
 							{text : 'Posting Date', 	dataIndex : 'postingDate',	width : 98},
@@ -237,7 +237,7 @@
 			}, {
 				xtype 	: 'grid',
 				title 	: 'Items',
-				id 		: 'grid-salesInvoiceItems-salesInvoice',
+				id 		: 'grid-salesReturnItems-salesReturn',
 				store 	: businessPartnerStore,
 				columnWidth: 1,
 				height 	: 200,
@@ -318,7 +318,7 @@
 				}*/
 			}, {
 				text 	: 'Delete',
-				id 		: 'btn-delete-salesInvoice',
+				id 		: 'btn-delete-salesReturn',
 				disabled: true,
 				/*handler : function()
 				{

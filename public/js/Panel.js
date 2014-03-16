@@ -20,6 +20,7 @@
             Checkup.Windows.openedWindows.push('Checkup.' + windowPath);*/
 
             Ext.get('panel-main-body').update('');
+            console.log(windowPath);
             var win = Ext.create('Checkup.' + windowPath, {
                 renderTo     : 'panel-main-body',
                 style       : 'margin: auto; top:20px;',
@@ -79,7 +80,9 @@
                                     id      : 'Sales-ARInvoice',
                                     handler : menuHandler
                                 }, {
-                                    text    : 'Sales Return'
+                                    text    : 'Sales Return',
+                                    id      : 'Sales-Return',
+                                    handler : menuHandler
                                 }
                             ]
                         }
@@ -88,9 +91,13 @@
                         menu    : {
                             items   : [
                                 {
-                                    text    : 'Puchase Order'
+                                    text    : 'Puchase Order',
+                                    id      : 'Purchasing-PurchaseOrder',
+                                    handler : menuHandler
                                 }, {
-                                    text    : 'Goods Receipt PO'
+                                    text    : 'Goods Receipt PO',
+                                    id      : 'Purchasing-GRPO',
+                                    handler : menuHandler
                                 }
                             ]
                         }

@@ -13,4 +13,13 @@ class SalesInvoice extends Table
                         ->from($this->_name);
         return $this->fetchAllToArray($select);
     }
+
+    public function getSalesInvoiceByDocId($docId)
+    {
+    	$select = $this->select()
+                        ->from($this->_name)
+                        ->where(array('docId' => $docId));
+                        
+        return $this->fetchRowToArray($select);
+    }
 }

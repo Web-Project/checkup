@@ -13,4 +13,12 @@ class SalesInvoiceItem extends Table
                         ->from($this->_name);
         return $this->fetchAllToArray($select);
     }
+
+    public function getSalesInvoiceItem($docId)
+    {
+        $select = $this->select()
+                        ->from($this->_name)
+                        ->where(array('docId' => $docId));
+        return $this->fetchAllToArray($select);
+    }
 }

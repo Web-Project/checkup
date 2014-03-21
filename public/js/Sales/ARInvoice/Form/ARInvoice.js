@@ -2,9 +2,11 @@
 	var me, origUsername, finalUsername;
 	var businessPartnerStoreUrl = 'application/BusinessPartner',
 		salesInvoiceStoreUrl = 'application/SalesInvoice',
-		salesInvoiceItemsStoreUrl = 'application/SalesInvoiceItem',
+		salesInvoiceItemsStoreUrl = 'application/SalesInvoiceItem/getSalesItemsByDocId',
 		submit_url = 'application/user/saveUser',
-		deleteUrl = 'application/user/deleteUser';
+		deleteUrl = 'application/user/deleteUser',
+		reportArInvoiceUrl = 'application/SalesInvoice/printSalesARInvoice',
+		docId;
 
 
 	var businessPartnerStoreFields = [
@@ -14,16 +16,16 @@
 	var salesInvoiceStoreFields = [
 		'id', 'docId', 'customerCode', 'customerName',
 		'postingDate', 'remarks1', 'remarks2', 
-		'totalDscntInPrcnt', 'totalDscntInAmt',
+		'totalPrcntDscnt', 'totalAmtDscnt',
 		'netTotal', 'grossTotal'
 	];
 
 	var salesInvoiceItemStoreFields = [
-		'docId', 'indx', 'itemCode', 'description',
-		'vatable', 'saleUoM', 'qtyPrSaleUoM',
-		'netPrchsPrice', 'grossPrchsPrice', 'realNetSalePrice',
-		'realGrossSalePrice', 'qty', 'prcntDscnt', 'amtDscnt',
-		'netSalePrice','grossSalePrice', 'rowNetTotal', 'rowGrossTotal'
+		'docId','indx','itemCode','description','vatable',
+        'saleUoM','qtyPrSaleUoM','netPrchsPrc','grossPrchsPrc',
+        'realBsNetSalePrc', 'realBsGrossSalePrc', 'qty',
+        'prcntDscnt', 'amtDscnt', 'netSalePrc', 'grossSalePrc',
+        'rowNetTotal', 'rowGrossTotal'
 	];
 
 	var businessPartnerStore = Ext.create('Ext.data.Store',
@@ -42,6 +44,14 @@
 	    fields: salesInvoiceStoreFields
 	});
 
+	var salesInvoiceItemsStore = Ext.create('Ext.data.Store',
+	{
+		id 		: 'store-salesInvoiceItemsStore',
+		proxy	: proxy(salesInvoiceItemsStoreUrl, {}),
+		autoLoad: false ,
+	    fields: salesInvoiceItemStoreFields
+	});
+
 	function getCurrentDate()
 	{
 		var date = new Date();
@@ -52,38 +62,23 @@
 		return year + '-' + month + '-' + day;
 	}
 
-	/*function populateFields(data)
+	function populateFields(data)
 	{
-		Ext.getCmp('user_id').setValue(data.user_id);
-		Ext.getCmp('txt-username-users').setValue(data.username);
-		Ext.getCmp('txt-firstname-users').setValue(data.fName);
-		Ext.getCmp('txt-middlename-users').setValue(data.midName);
-		Ext.getCmp('txt-lastname-users').setValue(data.lName);
-		Ext.getCmp('txt-email-users').setValue(data.email);
-		Ext.getCmp('txt-address-users').setValue(data.address);
-		Ext.getCmp('cbo-gender-users').setValue(data.gender);
-		Ext.getCmp('cbo-role-users').setValue(data.role);
+		docId = data.docId;
 
-		if(data.picLocation)
-		{
-			Ext.getCmp('img-user-picture').setSrc( '/img/userPic/' + data.picLocation);
-		}
-		else
-		{
-			Ext.getCmp('img-user-picture').setSrc( '');
-		}
+		Ext.getCmp('txt-salesInvoiceId-salesInvoice').setValue(data.docId);
+		Ext.getCmp('txt-postingDate-salesInvoice').setValue(data.postingDate);
+		Ext.getCmp('cbo-customerCode-salesInvoice').setValue(data.customerCode);
+		Ext.getCmp('cbo-customerName-salesInvoice').setValue(data.customerName);
+		Ext.getCmp('txtarea-remarks1-salesInvoice').setValue(data.remarks1);
+		Ext.getCmp('txtarea-remarks2-salesInvoice').setValue(data.remarks2);
+		Ext.getCmp('txt-totalDscntInPrcnt-salesInvoice').setValue(data.totalPrcntDscnt);
+		Ext.getCmp('txt-totalDscntInAmt-salesInvoice').setValue(data.totalAmtDscnt);
+		Ext.getCmp('txt-netTotal-salesInvoice').setValue(data.netTotal);
+		Ext.getCmp('txt-grossTotal-salesInvoice').setValue(data.grossTotal);
 
-		if(data.deactivated == 'Y')
-		{
-			Ext.getCmp('chk-deactivate-users').setValue(true);
-		}
-		else
-		{
-			Ext.getCmp('chk-deactivate-users').setValue(false);
-		}
-
-		origUsername = data.username;
-	}*/
+		salesInvoiceItemsStore.load({params : { docId : data.docId}});
+	}
 
 	Ext.define('Checkup.Sales.ARInvoice.Form.ARInvoice',
 	{
@@ -231,14 +226,25 @@
 							{text : 'Total Discount Amt', 	dataIndex : 'totalDscntInAmt',	width : 102},
 							{text : 'Net Total', 	dataIndex : 'netTotal',	width : 87},
 							{text : 'Gross Total', 	dataIndex : 'grossTotal',	width : 87}
-						]
+						],
+						listeners : {
+							selectionchange : function(grid, selected, eOpts) {
+								if(selected[0] != null && selected[0] != 'undefined')
+								{
+									populateFields(selected[0].raw);
+
+									Ext.getCmp('btn-delete-salesInvoice').enable();
+									Ext.getCmp('btn-print-salesInvoice').enable();
+								}
+							}
+						}
 					}
 				]
 			}, {
 				xtype 	: 'grid',
 				title 	: 'Items',
 				id 		: 'grid-salesInvoiceItems-salesInvoice',
-				store 	: businessPartnerStore,
+				store 	: salesInvoiceItemsStore,
 				columnWidth: 1,
 				height 	: 200,
 				margin 	: '0 10 10 10',
@@ -247,17 +253,17 @@
 					{text : 'Item Code', 	dataIndex : 'itemCode', width : 63},
 					{text : 'Description', 	dataIndex : 'description',	width : 170},
 					{text : 'Vatable', 	dataIndex : 'vatable',	width : 50},
-					{text : 'Net Pur. Price', 	dataIndex : 'netPrchsPrice',	width : 95},
-					{text : 'Gross Pur. Price1', 	dataIndex : 'grossPrchsPrice',	width : 95},
+					{text : 'Net Pur. Price', 	dataIndex : 'netPrchsPrc',	width : 95},
+					{text : 'Gross Pur. Price1', 	dataIndex : 'grossPrchsPrc',	width : 95},
 					{text : 'Sale UoM', 	dataIndex : 'saleUoM',	width : 55},
 					{text : 'Qty/Sale UoM', 	dataIndex : 'qtyPrSaleUoM',	width : 77},
-					{text : 'Real Base Net Sale Price', 	dataIndex : 'realNetSalePrice',	width : 139},
-					{text : 'Real Base Gross Sale Price', 	dataIndex : 'realGrossSalePrice',	width : 139},
+					{text : 'Real Base Net Sale Price', 	dataIndex : 'realBsNetSalePrc',	width : 139},
+					{text : 'Real Base Gross Sale Price', 	dataIndex : 'realBsNetSalePrc',	width : 139},
 					{text : 'Qty', 	dataIndex : 'qty',	width : 60},
 					{text : '% Discount', 	dataIndex : 'prcntDscnt',	width : 80},
 					{text : 'Amt Discount', 	dataIndex : 'amtDscnt',	width : 77},
-					{text : 'Net Sale Price', 	dataIndex : 'netSalePrice',	width : 90},
-					{text : 'Gross Sale Price', 	dataIndex : 'grossSalePrice',	width : 90},
+					{text : 'Net Sale Price', 	dataIndex : 'netSalePrc',	width : 90},
+					{text : 'Gross Sale Price', 	dataIndex : 'grossSalePrc',	width : 90},
 					{text : 'Row Net Total', 	dataIndex : 'rowNetTotal',	width : 90},	
 					{text : 'Row Gross Total', 	dataIndex : 'rowGrossTotal',	width : 90}
 				]
@@ -368,11 +374,17 @@
 					}
 				}*/
 			}, {
-				text 	: 'Close',
+				text 	: 'Print',
+				id 		: 'btn-print-salesInvoice',
+				disabled: true,
 				handler : function()
 				{
-					me.getForm().reset();
-					me.up('window').close();
+					new Ext.Window({
+                        height: Ext.getBody().getViewSize().height,
+                        width: Ext.getBody().getViewSize().width - 20,
+                        html : '<iframe style="width:100%;height:670px;" frameborder="0"  src="' + reportArInvoiceUrl + '?docId=' + docId + '"></iframe>',
+                        modal: true
+                    }).show();
 				}
 			}
 		]

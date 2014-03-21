@@ -84,6 +84,7 @@ return array(
     'controller_plugins' => array(
         'invokables' => array(
             'NoCSRF' => 'Application\Controller\Plugin\NoCSRF',
+            'Report' => 'Application\Controller\Plugin\Report',
         ),
     ),
     'view_manager' => array(

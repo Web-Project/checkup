@@ -22,6 +22,7 @@ class Table
 
     public function fetchAllToArray(Select $select)
     {
+        $results = array();
         $statement = $this->_sql->prepareStatementForSqlObject($select);
         foreach ($statement->execute() as $row) {
             $results[] = $row;

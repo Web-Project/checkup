@@ -1,4 +1,4 @@
-s<?php
+<?php
 namespace Application\Controller;
 
 use Application\Controller\Controller;
@@ -29,6 +29,35 @@ class SalesInvoiceItemController extends Controller
             $retVal['totalRecords'] = count($result);
         }
 
+
+        return new JsonModel($retVal);
+    }
+
+    public function getSalesItemsByDocIdAction()
+    {
+        $retVal = array(
+            'success'       => false,
+            'rows'          => array(),
+            'totalRecords'  => 0
+        );
+
+        $request = $this->getRequest();
+
+        if ($request->isPost()) 
+        {
+            $postData = $request->getPost();
+
+            $docId = $postData['docId'];
+            $model = $this->model('SalesInvoiceItem');
+            $result = $model->getSalesInvoiceItem($docId);
+
+            if(!empty($result))
+            {
+                $retVal['success'] = true;
+                $retVal['rows'] = $result;
+                $retVal['totalRecords'] = count($result);
+            }
+        }
 
         return new JsonModel($retVal);
     }

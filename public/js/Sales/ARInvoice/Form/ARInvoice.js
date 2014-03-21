@@ -382,7 +382,7 @@
 					new Ext.Window({
                         height: Ext.getBody().getViewSize().height,
                         width: Ext.getBody().getViewSize().width - 20,
-                        html : '<iframe style="width:100%;height:650px;" frameborder="0"  src="' + reportArInvoiceUrl + '?docId=' + docId + '"></iframe>',
+                        html : '<iframe style="width:100%;height:' + (Ext.getBody().getViewSize().height - 30) + 'px;" frameborder="0"  src="' + reportArInvoiceUrl + '?docId=' + docId + '"></iframe>',
                         modal: true
                     }).show();
 				}

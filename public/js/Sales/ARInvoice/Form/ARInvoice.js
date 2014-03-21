@@ -119,7 +119,7 @@
 								xtype 		: 'textfield',
 								fieldLabel 	: 'Sales Invoice #',
 								readOnly 	: true,
-								name 		: 'salesInvoidId',
+								name 		: 'salesInvoiceId',
 								id 			: 'txt-salesInvoiceId-salesInvoice',
 								columnWidth	: 1,
 								margin 		: '5 0 0 0'

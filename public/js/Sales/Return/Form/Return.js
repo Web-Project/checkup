@@ -1,29 +1,31 @@
 (function(){
 	var me, origUsername, finalUsername;
 	var businessPartnerStoreUrl = 'application/BusinessPartner',
-		salesInvoiceStoreUrl = 'application/SalesInvoice',
-		salesInvoiceItemsStoreUrl = 'application/SalesInvoiceItem',
+		salesReturnStoreUrl = 'application/SalesReturn',
+		salesReturnItemsStoreUrl = 'application/SalesReturnItem/getSalesItemsByDocId',
 		submit_url = 'application/user/saveUser',
-		deleteUrl = 'application/user/deleteUser';
+		deleteUrl = 'application/user/deleteUser',
+		reportSalesReturnUrl = 'application/SalesReturn/printSalesReturn',
+		docId;
 
 
 	var businessPartnerStoreFields = [
 		'code', 'BPName'
 	];
 
-	var salesInvoiceStoreFields = [
+	var salesReturnStoreFields = [
 		'id', 'docId', 'customerCode', 'customerName',
 		'postingDate', 'remarks1', 'remarks2', 
-		'totalDscntInPrcnt', 'totalDscntInAmt',
+		'totalPrcntDscnt', 'totalAmtDscnt',
 		'netTotal', 'grossTotal'
 	];
 
-	var salesInvoiceItemStoreFields = [
-		'docId', 'indx', 'itemCode', 'description',
-		'vatable', 'saleUoM', 'qtyPrSaleUoM',
-		'netPrchsPrice', 'grossPrchsPrice', 'realNetSalePrice',
-		'realGrossSalePrice', 'qty', 'prcntDscnt', 'amtDscnt',
-		'netSalePrice','grossSalePrice', 'rowNetTotal', 'rowGrossTotal'
+	var salesReturnItemStoreFields = [
+		'docId','indx','itemCode','description','vatable',
+        'saleUoM','qtyPrSaleUoM','netPrchsPrc','grossPrchsPrc',
+        'realBsNetSalePrc', 'realBsGrossSalePrc', 'qty',
+        'prcntDscnt', 'amtDscnt', 'netSalePrc', 'grossSalePrc',
+        'rowNetTotal', 'rowGrossTotal'
 	];
 
 	var businessPartnerStore = Ext.create('Ext.data.Store',
@@ -34,12 +36,20 @@
 	    fields: businessPartnerStoreFields
 	});
 
-	var salesInvoiceStore = Ext.create('Ext.data.Store',
+	var salesReturnStore = Ext.create('Ext.data.Store',
 	{
 		id 		: 'store-salesReturnStore',
-		proxy	: proxy(salesInvoiceStoreUrl, {}),
+		proxy	: proxy(salesReturnStoreUrl, {}),
 		autoLoad: true ,
-	    fields: salesInvoiceStoreFields
+	    fields: salesReturnStoreFields
+	});
+
+	var salesReturnItemsStore = Ext.create('Ext.data.Store',
+	{
+		id 		: 'store-salesReturnItemsStore',
+		proxy	: proxy(salesReturnItemsStoreUrl, {}),
+		autoLoad: false ,
+	    fields: salesReturnItemStoreFields
 	});
 
 	function getCurrentDate()
@@ -52,38 +62,23 @@
 		return year + '-' + month + '-' + day;
 	}
 
-	/*function populateFields(data)
+	function populateFields(data)
 	{
-		Ext.getCmp('user_id').setValue(data.user_id);
-		Ext.getCmp('txt-username-users').setValue(data.username);
-		Ext.getCmp('txt-firstname-users').setValue(data.fName);
-		Ext.getCmp('txt-middlename-users').setValue(data.midName);
-		Ext.getCmp('txt-lastname-users').setValue(data.lName);
-		Ext.getCmp('txt-email-users').setValue(data.email);
-		Ext.getCmp('txt-address-users').setValue(data.address);
-		Ext.getCmp('cbo-gender-users').setValue(data.gender);
-		Ext.getCmp('cbo-role-users').setValue(data.role);
+		docId = data.docId;
 
-		if(data.picLocation)
-		{
-			Ext.getCmp('img-user-picture').setSrc( '/img/userPic/' + data.picLocation);
-		}
-		else
-		{
-			Ext.getCmp('img-user-picture').setSrc( '');
-		}
+		Ext.getCmp('txt-salesReturnId-salesReturn').setValue(data.docId);
+		Ext.getCmp('txt-postingDate-salesReturn').setValue(data.postingDate);
+		Ext.getCmp('cbo-customerCode-salesReturn').setValue(data.customerCode);
+		Ext.getCmp('cbo-customerName-salesReturn').setValue(data.customerName);
+		Ext.getCmp('txtarea-remarks1-salesReturn').setValue(data.remarks1);
+		Ext.getCmp('txtarea-remarks2-salesReturn').setValue(data.remarks2);
+		Ext.getCmp('txt-totalDscntInPrcnt-salesReturn').setValue(data.totalPrcntDscnt);
+		Ext.getCmp('txt-totalDscntInAmt-salesReturn').setValue(data.totalAmtDscnt);
+		Ext.getCmp('txt-netTotal-salesReturn').setValue(data.netTotal);
+		Ext.getCmp('txt-grossTotal-salesReturn').setValue(data.grossTotal);
 
-		if(data.deactivated == 'Y')
-		{
-			Ext.getCmp('chk-deactivate-users').setValue(true);
-		}
-		else
-		{
-			Ext.getCmp('chk-deactivate-users').setValue(false);
-		}
-
-		origUsername = data.username;
-	}*/
+		salesReturnItemsStore.load({params : { docId : data.docId}});
+	}
 
 	Ext.define('Checkup.Sales.Return.Form.Return',
 	{
@@ -124,7 +119,7 @@
 								xtype 		: 'textfield',
 								fieldLabel 	: 'Sales Return #',
 								readOnly 	: true,
-								name 		: 'salesInvoidId',
+								name 		: 'salesReturnId',
 								id 			: 'txt-salesReturnId-salesReturn',
 								columnWidth	: 1,
 								margin 		: '5 0 0 0'
@@ -216,7 +211,7 @@
 					}, {
 						xtype 	: 'grid',
 						id 		: 'grid-salesReturnList-salesReturn',
-						store 	: salesInvoiceStore,
+						store 	: salesReturnStore,
 						columnWidth: 1,
 						height 	: 420,
 						margin 	: '10 10 10 5',
@@ -231,14 +226,25 @@
 							{text : 'Total Discount Amt', 	dataIndex : 'totalDscntInAmt',	width : 102},
 							{text : 'Net Total', 	dataIndex : 'netTotal',	width : 87},
 							{text : 'Gross Total', 	dataIndex : 'grossTotal',	width : 87}
-						]
+						],
+						listeners : {
+							selectionchange : function(grid, selected, eOpts) {
+								if(selected[0] != null && selected[0] != 'undefined')
+								{
+									populateFields(selected[0].raw);
+
+									Ext.getCmp('btn-delete-salesReturn').enable();
+									Ext.getCmp('btn-print-salesReturn').enable();
+								}
+							}
+						}
 					}
 				]
 			}, {
 				xtype 	: 'grid',
 				title 	: 'Items',
 				id 		: 'grid-salesReturnItems-salesReturn',
-				store 	: businessPartnerStore,
+				store 	: salesReturnItemsStore,
 				columnWidth: 1,
 				height 	: 200,
 				margin 	: '0 10 10 10',
@@ -247,17 +253,17 @@
 					{text : 'Item Code', 	dataIndex : 'itemCode', width : 63},
 					{text : 'Description', 	dataIndex : 'description',	width : 170},
 					{text : 'Vatable', 	dataIndex : 'vatable',	width : 50},
-					{text : 'Net Pur. Price', 	dataIndex : 'netPrchsPrice',	width : 95},
-					{text : 'Gross Pur. Price1', 	dataIndex : 'grossPrchsPrice',	width : 95},
+					{text : 'Net Pur. Price', 	dataIndex : 'netPrchsPrc',	width : 95},
+					{text : 'Gross Pur. Price1', 	dataIndex : 'grossPrchsPrc',	width : 95},
 					{text : 'Sale UoM', 	dataIndex : 'saleUoM',	width : 55},
 					{text : 'Qty/Sale UoM', 	dataIndex : 'qtyPrSaleUoM',	width : 77},
-					{text : 'Real Base Net Sale Price', 	dataIndex : 'realNetSalePrice',	width : 139},
-					{text : 'Real Base Gross Sale Price', 	dataIndex : 'realGrossSalePrice',	width : 139},
+					{text : 'Real Base Net Sale Price', 	dataIndex : 'realBsNetSalePrc',	width : 139},
+					{text : 'Real Base Gross Sale Price', 	dataIndex : 'realBsNetSalePrc',	width : 139},
 					{text : 'Qty', 	dataIndex : 'qty',	width : 60},
 					{text : '% Discount', 	dataIndex : 'prcntDscnt',	width : 80},
 					{text : 'Amt Discount', 	dataIndex : 'amtDscnt',	width : 77},
-					{text : 'Net Sale Price', 	dataIndex : 'netSalePrice',	width : 90},
-					{text : 'Gross Sale Price', 	dataIndex : 'grossSalePrice',	width : 90},
+					{text : 'Net Sale Price', 	dataIndex : 'netSalePrc',	width : 90},
+					{text : 'Gross Sale Price', 	dataIndex : 'grossSalePrc',	width : 90},
 					{text : 'Row Net Total', 	dataIndex : 'rowNetTotal',	width : 90},	
 					{text : 'Row Gross Total', 	dataIndex : 'rowGrossTotal',	width : 90}
 				]
@@ -368,11 +374,17 @@
 					}
 				}*/
 			}, {
-				text 	: 'Close',
+				text 	: 'Print',
+				id 		: 'btn-print-salesReturn',
+				disabled: true,
 				handler : function()
 				{
-					me.getForm().reset();
-					me.up('window').close();
+					new Ext.Window({
+                        height: Ext.getBody().getViewSize().height,
+                        width: Ext.getBody().getViewSize().width - 20,
+                        html : '<iframe style="width:100%;height:' + (Ext.getBody().getViewSize().height - 30) + 'px;" frameborder="0"  src="' + reportSalesReturnUrl + '?docId=' + docId + '"></iframe>',
+                        modal: true
+                    }).show();
 				}
 			}
 		]

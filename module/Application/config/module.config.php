@@ -78,7 +78,9 @@ return array(
             'Application\Controller\Warehouse' => 'Application\Controller\WarehouseController',
             'Application\Controller\BusinessPartner' => 'Application\Controller\BusinessPartnerController',
             'Application\Controller\SalesInvoice' => 'Application\Controller\SalesInvoiceController',
-            'Application\Controller\SalesInvoiceItem' => 'Application\Controller\SalesInvoiceItemController'
+            'Application\Controller\SalesInvoiceItem' => 'Application\Controller\SalesInvoiceItemController',
+            'Application\Controller\SalesReturn' => 'Application\Controller\SalesReturnController',
+            'Application\Controller\SalesReturnItem' => 'Application\Controller\SalesReturnItemController'
         ),
     ),
     'controller_plugins' => array(

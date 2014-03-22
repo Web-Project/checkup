@@ -82,7 +82,9 @@ return array(
             'Application\Controller\SalesReturn' => 'Application\Controller\SalesReturnController',
             'Application\Controller\SalesReturnItem' => 'Application\Controller\SalesReturnItemController',
             'Application\Controller\PurchaseOrder' => 'Application\Controller\PurchaseOrderController',
-            'Application\Controller\PurchaseOrderItem' => 'Application\Controller\PurchaseOrderItemController'
+            'Application\Controller\PurchaseOrderItem' => 'Application\Controller\PurchaseOrderItemController',
+            'Application\Controller\GRPO' => 'Application\Controller\GRPOController',
+            'Application\Controller\GRPOItem' => 'Application\Controller\GRPOItemController'
         ),
     ),
     'controller_plugins' => array(

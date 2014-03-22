@@ -67,8 +67,8 @@
 
 		Ext.getCmp('txt-purchaseOrderId-purchaseOrder').setValue(data.docId);
 		Ext.getCmp('txt-postingDate-purchaseOrder').setValue(data.postingDate);
-		Ext.getCmp('cbo-customerCode-purchaseOrder').setValue(data.vendorCode);
-		Ext.getCmp('cbo-customerName-purchaseOrder').setValue(data.vendorName);
+		Ext.getCmp('cbo-vendorCode-purchaseOrder').setValue(data.vendorCode);
+		Ext.getCmp('cbo-vendorName-purchaseOrder').setValue(data.vendorName);
 		Ext.getCmp('txtarea-remarks1-purchaseOrder').setValue(data.remarks1);
 		Ext.getCmp('txtarea-remarks2-purchaseOrder').setValue(data.remarks2);
 		Ext.getCmp('txt-totalDscntInPrcnt-purchaseOrder').setValue(data.totalPrcntDscnt);
@@ -116,7 +116,7 @@
 						items 	: [
 							{
 								xtype 		: 'textfield',
-								fieldLabel 	: 'Purchase Order #',
+								fieldLabel 	: 'Prchs Order #',
 								readOnly 	: true,
 								name 		: 'purchaseOrderId',
 								id 			: 'txt-purchaseOrderId-purchaseOrder',
@@ -133,10 +133,10 @@
 								value 		: getCurrentDate()
 							}, {
 								xtype 		: 'combo',
-								fieldLabel 	: 'Customer Code',
+								fieldLabel 	: 'Vendor Code',
 								columnWidth : 1,
-								name 		: 'customerCode',
-								id 			: 'cbo-customerCode-purchaseOrder',
+								name 		: 'vendorCode',
+								id 			: 'cbo-vendorCode-purchaseOrder',
 								queryMode 	: 'local',
 								triggerAction: 'all',
 								forceSelection:false,
@@ -148,10 +148,10 @@
 								allowBlank 	: false
 							}, {
 								xtype 		: 'combo',
-								fieldLabel 	: 'Customer Name',
+								fieldLabel 	: 'Vendor Name',
 								columnWidth : 1,
-								name 		: 'customerName',
-								id 			: 'cbo-customerName-purchaseOrder',
+								name 		: 'vendorName',
+								id 			: 'cbo-vendorName-purchaseOrder',
 								queryMode 	: 'local',
 								triggerAction: 'all',
 								forceSelection:false,
@@ -216,8 +216,8 @@
 						margin 	: '10 10 10 5',
 						columns : [
 							{text : 'Purchase Order ID', 	dataIndex : 'docId',	width : 88},
-							{text : 'Customer Code', 	dataIndex : 'customerCode',	width : 86},
-							{text : 'Customer Name', 	dataIndex : 'customerName',	width : 159},
+							{text : 'Vendor Code', 	dataIndex : 'vendorCode',	width : 86},
+							{text : 'Vendor Name', 	dataIndex : 'vendorName',	width : 159},
 							{text : 'Posting Date', 	dataIndex : 'postingDate',	width : 98},
 							{text : 'Remarks 1', 	dataIndex : 'remarks1',	width : 100},
 							{text : 'Remakrs 2', 	dataIndex : 'remarks2',	width : 100},
@@ -254,9 +254,9 @@
 					{text : 'Vatable', 	dataIndex : 'vatable',	width : 50},
 					{text : 'Qty', 	dataIndex : 'qty',	width : 60},
 					{text : 'Base UoM', 	dataIndex : 'baseUoM',	width : 55},
-					{text : 'Qty/Prchs UoM', 	dataIndex : 'qtyPrPrchsUoM',	width : 77},
-					{text : 'Real Base Net Purchase Price', 	dataIndex : 'realBsNetPrchsPrc',	width : 139},
-					{text : 'Real Base Gross Purchase Price', 	dataIndex : 'realBsGrossPrchsPrc',	width : 139},
+					{text : 'Qty/Prchs UoM', 	dataIndex : 'qtyPrPrchsUoM',	width : 83},
+					{text : 'Real Base Net Purchase Price', 	dataIndex : 'realBsNetPrchsPrc',	width : 161},
+					{text : 'Real Base Gross Purchase Price', 	dataIndex : 'realBsGrossPrchsPrc',	width : 161},
 					{text : 'Real Net Purchase Price', 	dataIndex : 'realNetPrchsPrc',	width : 139},
 					{text : 'Real Gross Purchase Price', 	dataIndex : 'realGrossPrchsPrc',	width : 139},
 					{text : 'Net Pur. Price', 	dataIndex : 'netPrchsPrc',	width : 95},

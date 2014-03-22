@@ -1,29 +1,33 @@
 (function(){
 	var me, origUsername, finalUsername;
 	var businessPartnerStoreUrl = 'application/BusinessPartner',
-		salesInvoiceStoreUrl = 'application/SalesInvoice',
-		salesInvoiceItemsStoreUrl = 'application/SalesInvoiceItem',
+		grpoStoreUrl = 'application/GRPO',
+		grpoItemsStoreUrl = 'application/GRPOItem/getGRPOItemsByDocId',
 		submit_url = 'application/user/saveUser',
-		deleteUrl = 'application/user/deleteUser';
+		deleteUrl = 'application/user/deleteUser',
+		reportGRPOUrl = 'application/GRPO/printGRPO',
+		docId;
 
 
 	var businessPartnerStoreFields = [
 		'code', 'BPName'
 	];
 
-	var salesInvoiceStoreFields = [
-		'id', 'docId', 'customerCode', 'customerName',
-		'postingDate', 'remarks1', 'remarks2', 
-		'totalDscntInPrcnt', 'totalDscntInAmt',
-		'netTotal', 'grossTotal'
+	var grpoStoreFields = [
+		'id', 'docId', 'vendorCode', 'vendorName',
+		'postingDate', 'remarks1', 'remarks2',
+		'totalPrcntDscnt', 'totalAmtDscnt', 'netTotal',
+		'grossTotal'
 	];
 
-	var salesInvoiceItemStoreFields = [
+	var grpoItemStoreFields = [
 		'docId', 'indx', 'itemCode', 'description',
-		'vatable', 'saleUoM', 'qtyPrSaleUoM',
-		'netPrchsPrice', 'grossPrchsPrice', 'realNetSalePrice',
-		'realGrossSalePrice', 'qty', 'prcntDscnt', 'amtDscnt',
-		'netSalePrice','grossSalePrice', 'rowNetTotal', 'rowGrossTotal'
+		'warehouse', 'vatable', 'realBsNetPrchsPrc',
+		'realBsGrossPrchsPrc', 'realNetPrchsPrc',
+		'realGrossPrchsPrc', 'qty', 'baseUoM',
+		'qtyPrPrchsUoM', 'prcntDscnt', 'amtDscnt',
+		'netPrchsPrc', 'grossPrchsPrc', 'rowNetTotal',
+		'rowGrossTotal'
 	];
 
 	var businessPartnerStore = Ext.create('Ext.data.Store',
@@ -34,12 +38,20 @@
 	    fields: businessPartnerStoreFields
 	});
 
-	var salesInvoiceStore = Ext.create('Ext.data.Store',
+	var grpoStore = Ext.create('Ext.data.Store',
 	{
-		id 		: 'store-salesInvoiceStore',
-		proxy	: proxy(salesInvoiceStoreUrl, {}),
+		id 		: 'store-grpoStore',
+		proxy	: proxy(grpoStoreUrl, {}),
 		autoLoad: true ,
-	    fields: salesInvoiceStoreFields
+	    fields: grpoStoreFields
+	});
+
+	var grpoItemsStore = Ext.create('Ext.data.Store',
+	{
+		id 		: 'store-grpoItemsStore',
+		proxy	: proxy(grpoItemsStoreUrl, {}),
+		autoLoad: false ,
+	    fields: grpoItemStoreFields
 	});
 
 	function getCurrentDate()
@@ -52,38 +64,23 @@
 		return year + '-' + month + '-' + day;
 	}
 
-	/*function populateFields(data)
+	function populateFields(data)
 	{
-		Ext.getCmp('user_id').setValue(data.user_id);
-		Ext.getCmp('txt-username-users').setValue(data.username);
-		Ext.getCmp('txt-firstname-users').setValue(data.fName);
-		Ext.getCmp('txt-middlename-users').setValue(data.midName);
-		Ext.getCmp('txt-lastname-users').setValue(data.lName);
-		Ext.getCmp('txt-email-users').setValue(data.email);
-		Ext.getCmp('txt-address-users').setValue(data.address);
-		Ext.getCmp('cbo-gender-users').setValue(data.gender);
-		Ext.getCmp('cbo-role-users').setValue(data.role);
+		docId = data.docId;
 
-		if(data.picLocation)
-		{
-			Ext.getCmp('img-user-picture').setSrc( '/img/userPic/' + data.picLocation);
-		}
-		else
-		{
-			Ext.getCmp('img-user-picture').setSrc( '');
-		}
+		Ext.getCmp('txt-grpoId-grpo').setValue(data.docId);
+		Ext.getCmp('txt-postingDate-grpo').setValue(data.postingDate);
+		Ext.getCmp('cbo-vendorCode-grpo').setValue(data.vendorCode);
+		Ext.getCmp('cbo-vendorName-grpo').setValue(data.vendorName);
+		Ext.getCmp('txtarea-remarks1-grpo').setValue(data.remarks1);
+		Ext.getCmp('txtarea-remarks2-grpo').setValue(data.remarks2);
+		Ext.getCmp('txt-totalDscntInPrcnt-grpo').setValue(data.totalPrcntDscnt);
+		Ext.getCmp('txt-totalDscntInAmt-grpo').setValue(data.totalAmtDscnt);
+		Ext.getCmp('txt-netTotal-grpo').setValue(data.netTotal);
+		Ext.getCmp('txt-grossTotal-grpo').setValue(data.grossTotal);
 
-		if(data.deactivated == 'Y')
-		{
-			Ext.getCmp('chk-deactivate-users').setValue(true);
-		}
-		else
-		{
-			Ext.getCmp('chk-deactivate-users').setValue(false);
-		}
-
-		origUsername = data.username;
-	}*/
+		grpoItemsStore.load({params : { docId : data.docId}});
+	}
 
 	Ext.define('Checkup.Purchasing.GRPO.Form.GRPO',
 	{
@@ -93,7 +90,7 @@
 		layout 		: 'column',
 		
 		border 		: true,
-		title 		: 'Purchasing - Goods Receipt PO',
+		title 		: 'Good Receipt Purchase Order',
 		//style 		: 'top : 0px !important',
 		width 		: '90%',
 
@@ -114,7 +111,7 @@
 				items 	: [
 					{
 						xtype 	: 'fieldset',
-						title 	: 'Sales Invoice Information',
+						title 	: 'GRPO Information',
 						width 	: 420,
 						height 	: 426,
 						layout 	: 'column',
@@ -122,10 +119,10 @@
 						items 	: [
 							{
 								xtype 		: 'textfield',
-								fieldLabel 	: 'Sales Invoice #',
+								fieldLabel 	: 'GRPO #',
 								readOnly 	: true,
-								name 		: 'salesInvoidId',
-								id 			: 'txt-salesInvoiceId-salesInvoice',
+								name 		: 'purchaseOrderId',
+								id 			: 'txt-grpoId-grpo',
 								columnWidth	: 1,
 								margin 		: '5 0 0 0'
 							}, {
@@ -133,16 +130,16 @@
 								fieldLabel 	: 'Posting Date',
 								readOnly 	: true,
 								name 		: 'postingDate',
-								id 			: 'txt-postingDate-salesInvoice',
+								id 			: 'txt-postingDate-grpo',
 								columnWidth	: 1,
 								margin 		: '5 0 0 0',
 								value 		: getCurrentDate()
 							}, {
 								xtype 		: 'combo',
-								fieldLabel 	: 'Customer Code',
+								fieldLabel 	: 'Vendor Code',
 								columnWidth : 1,
-								name 		: 'customerCode',
-								id 			: 'cbo-customerCode-salesInvoice',
+								name 		: 'vendorCode',
+								id 			: 'cbo-vendorCode-grpo',
 								queryMode 	: 'local',
 								triggerAction: 'all',
 								forceSelection:false,
@@ -154,10 +151,10 @@
 								allowBlank 	: false
 							}, {
 								xtype 		: 'combo',
-								fieldLabel 	: 'Customer Name',
+								fieldLabel 	: 'Vendor Name',
 								columnWidth : 1,
-								name 		: 'customerName',
-								id 			: 'cbo-customerName-salesInvoice',
+								name 		: 'vendorName',
+								id 			: 'cbo-vendorName-grpo',
 								queryMode 	: 'local',
 								triggerAction: 'all',
 								forceSelection:false,
@@ -172,21 +169,21 @@
 								fieldLabel 	: 'Remarks 1',
 								columnWidth : 1,
 								name 		: 'remarks1',
-								id 			: 'txtarea-remarks1-salesInvoice',
+								id 			: 'txtarea-remarks1-grpo',
 								margin 		: '5 0 0 0'
 							}, {
 								xtype 		: 'textarea',
 								fieldLabel 	: 'Remarks 2',
 								columnWidth : 1,
 								name 		: 'remarks2',
-								id 			: 'txtarea-remarks2-salesInvoice',
+								id 			: 'txtarea-remarks2-grpo',
 								margin 		: '5 0 0 0'
 							}, {
 								xtype 		: 'textfield',
 								fieldLabel 	: 'Total Discount %',
 								readOnly 	: true,
 								name 		: 'totalDscntInPrcnt',
-								id 			: 'txt-totalDscntInPrcnt-salesInvoice',
+								id 			: 'txt-totalDscntInPrcnt-grpo',
 								columnWidth	: 1,
 								margin 		: '5 0 0 0'
 							}, {
@@ -194,51 +191,62 @@
 								fieldLabel 	: 'Total Discount Amt',
 								readOnly 	: true,
 								name 		: 'totalDscntInAmt',
-								id 			: 'txt-totalDscntInAmt-salesInvoice',
+								id 			: 'txt-totalDscntInAmt-grpo',
 								columnWidth	: 1
 							}, {
 								xtype 		: 'textfield',
 								fieldLabel 	: 'Net Total',
 								readOnly 	: true,
 								name 		: 'netTotal',
-								id 			: 'txt-netTotal-salesInvoice',
+								id 			: 'txt-netTotal-grpo',
 								columnWidth	: 1
 							}, {
 								xtype 		: 'textfield',
 								fieldLabel 	: 'Gross Total',
 								readOnly 	: true,
 								name 		: 'grossTotal',
-								id 			: 'txt-grossTotal-salesInvoice',
+								id 			: 'txt-grossTotal-grpo',
 								columnWidth	: 1,
 								margin 		: '5 0 10 0'
 							}
 						]
 					}, {
 						xtype 	: 'grid',
-						id 		: 'grid-salesInvoiceList-salesInvoice',
-						store 	: salesInvoiceStore,
+						id 		: 'grid-grpoList-grpo',
+						store 	: grpoStore,
 						columnWidth: 1,
 						height 	: 420,
 						margin 	: '10 10 10 5',
 						columns : [
-							{text : 'Sales Invoice ID', 	dataIndex : 'docId',	width : 88},
-							{text : 'Customer Code', 	dataIndex : 'customerCode',	width : 86},
-							{text : 'Customer Name', 	dataIndex : 'customerName',	width : 159},
+							{text : 'GRPO ID', 	dataIndex : 'docId',	width : 88},
+							{text : 'Vendor Code', 	dataIndex : 'vendorCode',	width : 86},
+							{text : 'Vendor Name', 	dataIndex : 'vendorName',	width : 159},
 							{text : 'Posting Date', 	dataIndex : 'postingDate',	width : 98},
 							{text : 'Remarks 1', 	dataIndex : 'remarks1',	width : 100},
 							{text : 'Remakrs 2', 	dataIndex : 'remarks2',	width : 100},
-							{text : 'Total Discount %', 	dataIndex : 'totalDscntInPrcnt',	width : 96},
-							{text : 'Total Discount Amt', 	dataIndex : 'totalDscntInAmt',	width : 102},
+							{text : 'Total Discount %', 	dataIndex : 'totalPrcntDscnt',	width : 96},
+							{text : 'Total Discount Amt', 	dataIndex : 'totalAmtDscnt',	width : 102},
 							{text : 'Net Total', 	dataIndex : 'netTotal',	width : 87},
 							{text : 'Gross Total', 	dataIndex : 'grossTotal',	width : 87}
-						]
+						],
+						listeners : {
+							selectionchange : function(grid, selected, eOpts) {
+								if(selected[0] != null && selected[0] != 'undefined')
+								{
+									populateFields(selected[0].raw);
+
+									Ext.getCmp('btn-delete-grpo').enable();
+									Ext.getCmp('btn-print-grpo').enable();
+								}
+							}
+						}
 					}
 				]
 			}, {
 				xtype 	: 'grid',
 				title 	: 'Items',
-				id 		: 'grid-salesInvoiceItems-salesInvoice',
-				store 	: businessPartnerStore,
+				id 		: 'grid-grpoItems-grpo',
+				store 	: grpoItemsStore,
 				columnWidth: 1,
 				height 	: 200,
 				margin 	: '0 10 10 10',
@@ -247,19 +255,42 @@
 					{text : 'Item Code', 	dataIndex : 'itemCode', width : 63},
 					{text : 'Description', 	dataIndex : 'description',	width : 170},
 					{text : 'Vatable', 	dataIndex : 'vatable',	width : 50},
-					{text : 'Net Pur. Price', 	dataIndex : 'netPrchsPrice',	width : 95},
-					{text : 'Gross Pur. Price1', 	dataIndex : 'grossPrchsPrice',	width : 95},
-					{text : 'Sale UoM', 	dataIndex : 'saleUoM',	width : 55},
-					{text : 'Qty/Sale UoM', 	dataIndex : 'qtyPrSaleUoM',	width : 77},
-					{text : 'Real Base Net Sale Price', 	dataIndex : 'realNetSalePrice',	width : 139},
-					{text : 'Real Base Gross Sale Price', 	dataIndex : 'realGrossSalePrice',	width : 139},
+					{text : 'Warehouse', 	dataIndex : 'warehouse',	width : 77},
 					{text : 'Qty', 	dataIndex : 'qty',	width : 60},
+					{text : 'Base UoM', 	dataIndex : 'baseUoM',	width : 55},
+					{text : 'Qty/Prchs UoM', 	dataIndex : 'qtyPrPrchsUoM',	width : 83},
+					{text : 'Real Base Net Purchase Price', 	dataIndex : 'realBsNetPrchsPrc',	width : 161},
+					{text : 'Real Base Gross Purchase Price', 	dataIndex : 'realBsGrossPrchsPrc',	width : 161},
+					{text : 'Real Net Purchase Price', 	dataIndex : 'realNetPrchsPrc',	width : 139},
+					{text : 'Real Gross Purchase Price', 	dataIndex : 'realGrossPrchsPrc',	width : 139},
+					{text : 'Net Pur. Price', 	dataIndex : 'netPrchsPrc',	width : 95},
+					{text : 'Gross Pur. Price', 	dataIndex : 'grossPrchsPrc',	width : 95},
 					{text : '% Discount', 	dataIndex : 'prcntDscnt',	width : 80},
 					{text : 'Amt Discount', 	dataIndex : 'amtDscnt',	width : 77},
-					{text : 'Net Sale Price', 	dataIndex : 'netSalePrice',	width : 90},
-					{text : 'Gross Sale Price', 	dataIndex : 'grossSalePrice',	width : 90},
 					{text : 'Row Net Total', 	dataIndex : 'rowNetTotal',	width : 90},	
 					{text : 'Row Gross Total', 	dataIndex : 'rowGrossTotal',	width : 90}
+					
+				],
+				tbar 	: [
+					{
+						xtype 	: 'button',
+						text 	: 'Add Item',
+						id 		: 'btn-add-item-grpo',
+						disabled : true,
+						handler	: function()
+						{
+
+						}
+					}, {
+						xtype 	: 'button',
+						text 	: 'Delete Item',
+						id 		: 'btn-delete-item-grpo',
+						disabled: true,
+						handler : function()
+						{
+
+						}
+					}
 				]
 			}
 		],
@@ -318,7 +349,7 @@
 				}*/
 			}, {
 				text 	: 'Delete',
-				id 		: 'btn-delete-salesInvoice',
+				id 		: 'btn-delete-grpo',
 				disabled: true,
 				/*handler : function()
 				{
@@ -368,11 +399,17 @@
 					}
 				}*/
 			}, {
-				text 	: 'Close',
+				text 	: 'Print',
+				id 		: 'btn-print-grpo',
+				disabled: true,
 				handler : function()
 				{
-					me.getForm().reset();
-					me.up('window').close();
+					new Ext.Window({
+                        height: Ext.getBody().getViewSize().height,
+                        width: Ext.getBody().getViewSize().width - 20,
+                        html : '<iframe style="width:100%;height:' + (Ext.getBody().getViewSize().height - 30) + 'px;" frameborder="0"  src="' + reportGRPOUrl + '?docId=' + docId + '"></iframe>',
+                        modal: true
+                    }).show();
 				}
 			}
 		]

@@ -266,6 +266,27 @@
 					{text : 'Gross Sale Price', 	dataIndex : 'grossSalePrc',	width : 90},
 					{text : 'Row Net Total', 	dataIndex : 'rowNetTotal',	width : 90},	
 					{text : 'Row Gross Total', 	dataIndex : 'rowGrossTotal',	width : 90}
+				],
+				tbar 	: [
+					{
+						xtype 	: 'button',
+						text 	: 'Add Item',
+						id 		: 'btn-add-item-salesARInvoice',
+						disabled : true,
+						handler	: function()
+						{
+
+						}
+					}, {
+						xtype 	: 'button',
+						text 	: 'Delete Item',
+						id 		: 'btn-delete-item-salesARInvoice',
+						disabled: true,
+						handler : function()
+						{
+
+						}
+					}
 				]
 			}
 		],

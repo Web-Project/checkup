@@ -80,7 +80,9 @@ return array(
             'Application\Controller\SalesInvoice' => 'Application\Controller\SalesInvoiceController',
             'Application\Controller\SalesInvoiceItem' => 'Application\Controller\SalesInvoiceItemController',
             'Application\Controller\SalesReturn' => 'Application\Controller\SalesReturnController',
-            'Application\Controller\SalesReturnItem' => 'Application\Controller\SalesReturnItemController'
+            'Application\Controller\SalesReturnItem' => 'Application\Controller\SalesReturnItemController',
+            'Application\Controller\PurchaseOrder' => 'Application\Controller\PurchaseOrderController',
+            'Application\Controller\PurchaseOrderItem' => 'Application\Controller\PurchaseOrderItemController'
         ),
     ),
     'controller_plugins' => array(

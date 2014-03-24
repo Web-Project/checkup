@@ -106,7 +106,9 @@
                         menu    : {
                             items   : [
                                 {
-                                    text    : 'Business Partners'
+                                    text    : 'Business Partners',
+                                    id      : 'BusinessPartners-BusinessPartners',
+                                    handler : menuHandler
                                 }
                             ]
                         }

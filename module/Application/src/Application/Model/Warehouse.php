@@ -38,4 +38,20 @@ class Warehouse extends Table
 
         return $affected_rows;
     }
+
+    public function getTerminalStores()
+    {
+        $statement = $this->_dbAdapter->createStatement('SELECT terminalId
+            FROM terminal
+
+            UNION
+
+            SELECT code
+            FROM warehouse'
+        );
+
+        $result = $this->fetchAllToArray($statement);
+
+        return $result;
+    }
 }

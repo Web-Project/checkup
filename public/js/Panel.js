@@ -117,7 +117,9 @@
                         menu    : {
                             items   : [
                                 {
-                                    text    : 'Item Master Data'
+                                    text    : 'Item Master Data',
+                                    id      : 'Inventory-ItemMasterData',
+                                    handler : menuHandler
                                 }, {
                                     text    : 'Inventory Transactions',
                                     menu    : {

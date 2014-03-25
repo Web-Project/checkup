@@ -84,7 +84,8 @@ return array(
             'Application\Controller\PurchaseOrder' => 'Application\Controller\PurchaseOrderController',
             'Application\Controller\PurchaseOrderItem' => 'Application\Controller\PurchaseOrderItemController',
             'Application\Controller\GRPO' => 'Application\Controller\GRPOController',
-            'Application\Controller\GRPOItem' => 'Application\Controller\GRPOItemController'
+            'Application\Controller\GRPOItem' => 'Application\Controller\GRPOItemController',
+            'Application\Controller\ItemMasterData' => 'Application\Controller\ItemMasterDataController'
         ),
     ),
     'controller_plugins' => array(

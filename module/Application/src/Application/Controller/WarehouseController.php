@@ -168,4 +168,26 @@ class WarehouseController extends Controller
 
         return new JsonModel($retVal);
     }
+
+    public function getTerminalStoresAction()
+    {
+        $retVal = array(
+            'success'       => false,
+            'rows'          => array(),
+            'totalRecords'  => 0
+        );
+
+        $warehouse = $this->model('Warehouse');
+        $result = $warehouse->getTerminalStores();
+
+        if(!empty($result))
+        {
+            $retVal['success'] = true;
+            $retVal['rows'] = $result;
+            $retVal['totalRecords'] = count($result);
+        }
+
+
+        return new JsonModel($retVal);
+    }
 }

@@ -14,6 +14,15 @@ class BusinessPartner extends Table
         return $this->fetchAllToArray($select);
     }
 
+    public function getBusinessPartnersByType($type)
+    {
+        $select = $this->select()
+                        ->from($this->_name)
+                        ->where(array('BPType' => $type, 'deactivated' => 'N'));
+                        
+        return $this->fetchAllToArray($select);
+    }
+
     public function isCodeExist($code)
     {
     	$select = $this->select()

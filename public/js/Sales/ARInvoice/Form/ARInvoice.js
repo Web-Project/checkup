@@ -1,6 +1,6 @@
 (function(){
 	var me, origUsername, finalUsername;
-	var businessPartnerStoreUrl = 'application/BusinessPartner',
+	var businessPartnerStoreUrl = 'application/BusinessPartner/getBusinessPartnersByType',
 		salesInvoiceStoreUrl = 'application/SalesInvoice',
 		salesInvoiceItemsStoreUrl = 'application/SalesInvoiceItem/getSalesItemsByDocId',
 		submit_url = 'application/user/saveUser',
@@ -31,7 +31,7 @@
 	var businessPartnerStore = Ext.create('Ext.data.Store',
 	{
 		id 		: 'store-businessPartnerStore',
-		proxy	: proxy(businessPartnerStoreUrl, {}),
+		proxy	: proxy(businessPartnerStoreUrl, {type : '1'}),
 		autoLoad: true ,
 	    fields: businessPartnerStoreFields
 	});

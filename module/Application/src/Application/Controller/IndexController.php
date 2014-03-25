@@ -28,6 +28,10 @@ class IndexController extends Controller
             return $this->_view;
         }
 
+        if(strcasecmp($this->_sessionContainer->terminal_id, 'MAIN') != 0)
+        {
+            $this->_view->setTemplate('application/index/store');
+        }
         $this->_view->setVariables(
             array(
                 'token' => $token
@@ -57,6 +61,7 @@ class IndexController extends Controller
 
                 $username = $postData['username'];
                 $password = $postData['password'];
+                $store = $postData['store'];
                 
                 
                 $users = $this->model('Users');
@@ -87,25 +92,12 @@ class IndexController extends Controller
                         {
                             $users->logUserLastLogin($result['user_id']);
 
-                            $terminal = $this->model('Terminal');
-                            $terminalResult = $terminal->getTerminalId();
-
-                            if(empty($terminalResult))
-                            {
-                                $retVal = array(
-                                    "success" => false,
-                                    "errorMessage" => "Terminal ID not found",
-                                    "redirect" => "/"
-                                );
-                            }
-                            else
-                            {
-                                $this->_sessionContainer->user_id = $result['user_id'];
-                                $this->_sessionContainer->user_fName = $result['fName'];
-                                $this->_sessionContainer->user_lName = $result['lName'];
-                                $this->_sessionContainer->user_role = $result['role'];
-                                $this->_sessionContainer->terminal_id = $terminalResult['terminalId'];
-                            }
+                            $this->_sessionContainer->user_id = $result['user_id'];
+                            $this->_sessionContainer->user_fName = $result['fName'];
+                            $this->_sessionContainer->user_lName = $result['lName'];
+                            $this->_sessionContainer->user_role = $result['role'];
+                            $this->_sessionContainer->terminal_id = $store;
+                            
                         }
                         
                     } 

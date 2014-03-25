@@ -1,7 +1,20 @@
 (function(){
 
     var me;
-    var submitUrl = 'application/index/login';
+    var submitUrl = 'application/index/login',
+        warehouseStoreUrl = 'application/warehouse/getTerminalStores';
+
+    var warehouseStoreFields = [
+        'terminalId'
+    ];
+
+    var warehouseStore = Ext.create('Ext.data.Store',
+    {
+        id      : 'store-warehouseStore',
+        proxy   : proxy(warehouseStoreUrl, {}),
+        autoLoad: true ,
+        fields: warehouseStoreFields
+    });
 
     Ext.define('Checkup.Login.Form.Login',
     {
@@ -11,7 +24,8 @@
         frame       : false,
         width   : 300,
         border      : true,
-        //renderTo    : Ext.getBody(),
+        title   : 'Checkup Motor Parts Admin Panel Login',
+        renderTo    : Ext.getBody(),
 
         initComponent : function()
         {
@@ -49,6 +63,20 @@
                             xtype       : 'hiddenfield',
                             name        : 'token',
                             id          : 'csrf-token'
+                        }, {
+                            xtype       : 'combo',
+                            fieldLabel  : 'Store',
+                            width : 263,
+                            name        : 'store',
+                            id          : 'cbo-store-login',
+                            queryMode   : 'local',
+                            triggerAction: 'all',
+                            forceSelection:false,
+                            displayField: 'terminalId',
+                            valueField  : 'terminalId',
+                            store       : warehouseStore,
+                            margin      : 5,
+                            allowBlank  : false
                         }
                     ]
                 }
@@ -62,6 +90,7 @@
         buttons     : [
             {
                 text    : 'Login',
+                action  : 'Login',
                 handler : function()
                 {
                     var form = me.getForm();
@@ -95,7 +124,12 @@
                     me.getForm().reset();
                 }
             }
-        ]
+        ],
+        listeners: {
+            afterrender: function(b) {
+                b.down('button[action=Login]').focus(false, 100);  
+            }
+        }
     });
 
 })();

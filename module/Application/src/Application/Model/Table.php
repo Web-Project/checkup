@@ -20,19 +20,36 @@ class Table
         $this->_sql = new Sql($dbAdapter);
     }
 
-    public function fetchAllToArray(Select $select)
+    public function fetchAllToArray($select)
     {
         $results = array();
-        $statement = $this->_sql->prepareStatementForSqlObject($select);
+
+        if($select instanceof Select)
+        {
+            $statement = $this->_sql->prepareStatementForSqlObject($select);
+        }
+        else if($select instanceof \Zend\Db\Adapter\Driver\Pdo\Statement)
+        {
+            $statement = $select;
+        }
+        
         foreach ($statement->execute() as $row) {
             $results[] = $row;
         }
         return $results;
     }
 
-    public function fetchRowToArray(Select $select)
+    public function fetchRowToArray($select)
     {
-        $statement = $this->_sql->prepareStatementForSqlObject($select);
+        if($select instanceof Select)
+        {
+            $statement = $this->_sql->prepareStatementForSqlObject($select);
+        }
+        else if($select instanceof \Zend\Db\Adapter\Driver\Pdo\Statement)
+        {
+            $statement = $select;
+        }
+
         $result = $statement->execute()->current();
         return $result;
     }

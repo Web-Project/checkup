@@ -33,6 +33,41 @@ class BusinessPartnerController extends Controller
         return new JsonModel($retVal);
     }
 
+    public function getBusinessPartnersByTypeAction()
+    {
+        $retVal = array();
+
+        $request = $this->getRequest();
+
+        if ($request->isPost()) 
+        {
+            $postData = $request->getPost();
+
+            $type   = isset($postData['type'])?  $postData['type'] : '';
+            
+            $user = $this->model('BusinessPartner');
+            $result = $user->getBusinessPartnersByType($type);
+
+            if(!empty($result))
+            {
+                $retVal['success'] = true;
+                $retVal['rows'] = $result;
+                $retVal['totalRecords'] = count($result);
+            }
+            
+        }
+        else
+        {
+            $retVal = array(
+                'success'       => false,
+                'errorMessage' => 'Invalid request'
+            );
+        }
+
+
+        return new JsonModel($retVal);
+    }
+
     public function saveBusinessPartnerAction()
     {
         $data = array();

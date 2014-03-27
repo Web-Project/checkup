@@ -10,6 +10,8 @@ class Warehouse extends Table
     public function getWarehouseList()
     {
         $select = $this->select()
+                        ->quantifier('DISTINCT')
+                        ->join('grpo_item', 'grpo_item.warehouse = warehouse.code', array('warehouse'), 'left')
                         ->from($this->_name);
         return $this->fetchAllToArray($select);
     }

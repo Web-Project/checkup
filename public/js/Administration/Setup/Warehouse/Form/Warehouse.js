@@ -4,7 +4,7 @@
 		submit_url = 'application/warehouse/saveWarehouse',
 		deleteUrl = 'application/warehouse/deleteStore';
 	var warehouseFields = [
-		'id', 'code', 'name', 'deactivated'
+		'id', 'code', 'name', 'deactivated', 'warehouse'
 	];
 
 	var warehouseStore = Ext.create('Ext.data.Store',
@@ -70,7 +70,15 @@
 						{
 							populateFields(selected[0].raw);
 
-							Ext.getCmp('btn-delete-warehouse').enable();
+							var warehouse = selected[0].raw.warehouse;
+							if(warehouse != null && warehouse != 'undefined' && warehouse.length > 0)
+							{
+								Ext.getCmp('btn-delete-warehouse').disable();
+							}
+							else
+							{
+								Ext.getCmp('btn-delete-warehouse').enable();
+							}
 						}
 					}
 				}

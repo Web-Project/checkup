@@ -42,7 +42,7 @@
 
 		width 		: 830,
 		
-		title 		: 'Warehouse',
+		title 		: 'Warehouse/Store',
 
 		defaultType : 'textfield',
 

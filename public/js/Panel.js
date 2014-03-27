@@ -62,7 +62,7 @@
                                     menu    : {
                                         items   : [
                                             {
-                                                text    : 'Warehouse',
+                                                text    : 'Warehouse/Store',
                                                 id      : 'Administration-Setup-Warehouse',
                                                 handler : menuHandler
                                             }

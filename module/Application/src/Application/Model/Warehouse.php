@@ -14,6 +14,14 @@ class Warehouse extends Table
         return $this->fetchAllToArray($select);
     }
 
+    public function getActiveWarehouseList()
+    {
+        $select = $this->select()
+                        ->from($this->_name)
+                        ->where(array('deactivated' => 'N'));
+        return $this->fetchAllToArray($select);
+    }
+
     public function addStore($data)
     {
         $affected_rows = $this->insert($this->_name, $data);

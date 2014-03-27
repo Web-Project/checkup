@@ -125,9 +125,13 @@
                                     menu    : {
                                         items   : [
                                             {
-                                                text : 'Goods Return'
+                                                text : 'Goods Return',
+                                                id      : 'Inventory-InventoryTransactions-GoodsReturn',
+                                                handler : menuHandler
                                             }, {
-                                                text : 'Inventory Transfer'
+                                                text : 'Inventory Transfer',
+                                                id      : 'Inventory-InventoryTransactions-InventoryTransfer',
+                                                handler : menuHandler
                                             }
                                         ]
                                     }

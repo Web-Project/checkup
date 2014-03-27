@@ -222,8 +222,8 @@
 							{text : 'Posting Date', 	dataIndex : 'postingDate',	width : 98},
 							{text : 'Remarks 1', 	dataIndex : 'remarks1',	width : 100},
 							{text : 'Remakrs 2', 	dataIndex : 'remarks2',	width : 100},
-							{text : 'Total Discount %', 	dataIndex : 'totalDscntInPrcnt',	width : 96},
-							{text : 'Total Discount Amt', 	dataIndex : 'totalDscntInAmt',	width : 102},
+							{text : 'Total Discount %', 	dataIndex : 'totalPrcntDscnt',	width : 96},
+							{text : 'Total Discount Amt', 	dataIndex : 'totalAmtDscnt',	width : 102},
 							{text : 'Net Total', 	dataIndex : 'netTotal',	width : 87},
 							{text : 'Gross Total', 	dataIndex : 'grossTotal',	width : 87}
 						],

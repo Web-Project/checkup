@@ -1,55 +1,54 @@
 (function(){
 	var me, origUsername, finalUsername;
-	var businessPartnerStoreUrl = 'application/BusinessPartner/getBusinessPartnersByType',
-		salesReturnStoreUrl = 'application/SalesReturn',
-		salesReturnItemsStoreUrl = 'application/SalesReturnItem/getSalesItemsByDocId',
+	var warehouseStoreUrl = 'application/Warehouse/getActiveWarehouseList',
+		inventoryTransferStoreUrl = 'application/InventoryTransfer',
+		inventoryTransferItemsStoreUrl = 'application/InventoryTransferItem/getInventoryTransferItemsByDocId',
 		submit_url = 'application/user/saveUser',
 		deleteUrl = 'application/user/deleteUser',
-		reportSalesReturnUrl = 'application/SalesReturn/printSalesReturn',
+		reportInventoryTransferUrl = 'application/InventoryTransfer/printInventoryTransfer',
 		docId;
 
 
-	var businessPartnerStoreFields = [
-		'code', 'BPName'
+	var warehouseStoreFields = [
+		'code', 'name'
 	];
 
-	var salesReturnStoreFields = [
-		'id', 'docId', 'customerCode', 'customerName',
-		'postingDate', 'remarks1', 'remarks2', 
-		'totalPrcntDscnt', 'totalAmtDscnt',
-		'netTotal', 'grossTotal'
+	var inventoryTransferStoreFields = [
+		'id', 'docId', 'frmWHouse', 'toWHouse',
+		'postingDate', 'remarks1', 'remarks2', 'totalPrcntDscnt',
+		'totalAmtDscnt', 'netTotal', 'grossTotal'
 	];
 
-	var salesReturnItemStoreFields = [
-		'docId','indx','itemCode','description','vatable',
-        'saleUoM','qtyPrSaleUoM','netPrchsPrc','grossPrchsPrc',
-        'realBsNetSalePrc', 'realBsGrossSalePrc', 'qty',
-        'prcntDscnt', 'amtDscnt', 'netSalePrc', 'grossSalePrc',
-        'rowNetTotal', 'rowGrossTotal'
+	var inventoryTransferItemStoreFields = [
+		'docId', 'indx', 'itemCode', 'description', 'vatable',
+		'realBsNetPrchsPrc', 'realBsGrossPrchsPrc', 'realNetPrchsPrc',
+		'realGrossPrchsPrc', 'qty', 'baseUoM', 'qtyPrPrchsUoM',
+		'prcntDscnt', 'amtDscnt', 'netPrchsPrc', 'grossPrchsPrc',
+		'rowNetTotal', 'rowGrossTotal'
 	];
 
-	var businessPartnerStore = Ext.create('Ext.data.Store',
+	var warehouseStore = Ext.create('Ext.data.Store',
 	{
-		id 		: 'store-businessPartnerStore',
-		proxy	: proxy(businessPartnerStoreUrl, { type : '1'}),
+		id 		: 'store-warehouseStore',
+		proxy	: proxy(warehouseStoreUrl, { type : '0'}),
 		autoLoad: true ,
-	    fields: businessPartnerStoreFields
+	    fields: warehouseStoreFields
 	});
 
-	var salesReturnStore = Ext.create('Ext.data.Store',
+	var inventoryTransferStore = Ext.create('Ext.data.Store',
 	{
-		id 		: 'store-salesReturnStore',
-		proxy	: proxy(salesReturnStoreUrl, {}),
+		id 		: 'store-inventoryTransferStore',
+		proxy	: proxy(inventoryTransferStoreUrl, {}),
 		autoLoad: true ,
-	    fields: salesReturnStoreFields
+	    fields: inventoryTransferStoreFields
 	});
 
-	var salesReturnItemsStore = Ext.create('Ext.data.Store',
+	var inventoryTransferItemsStore = Ext.create('Ext.data.Store',
 	{
-		id 		: 'store-salesReturnItemsStore',
-		proxy	: proxy(salesReturnItemsStoreUrl, {}),
+		id 		: 'store-inventoryTransferItemsStore',
+		proxy	: proxy(inventoryTransferItemsStoreUrl, {}),
 		autoLoad: false ,
-	    fields: salesReturnItemStoreFields
+	    fields: inventoryTransferItemStoreFields
 	});
 
 	function getCurrentDate()
@@ -66,21 +65,20 @@
 	{
 		docId = data.docId;
 
-		Ext.getCmp('txt-salesReturnId-salesReturn').setValue(data.docId);
-		Ext.getCmp('txt-postingDate-salesReturn').setValue(data.postingDate);
-		Ext.getCmp('cbo-customerCode-salesReturn').setValue(data.customerCode);
-		Ext.getCmp('cbo-customerName-salesReturn').setValue(data.customerName);
-		Ext.getCmp('txtarea-remarks1-salesReturn').setValue(data.remarks1);
-		Ext.getCmp('txtarea-remarks2-salesReturn').setValue(data.remarks2);
-		Ext.getCmp('txt-totalDscntInPrcnt-salesReturn').setValue(data.totalPrcntDscnt);
-		Ext.getCmp('txt-totalDscntInAmt-salesReturn').setValue(data.totalAmtDscnt);
-		Ext.getCmp('txt-netTotal-salesReturn').setValue(data.netTotal);
-		Ext.getCmp('txt-grossTotal-salesReturn').setValue(data.grossTotal);
+		Ext.getCmp('txt-inventoryTransferId-inventoryTransfer').setValue(data.docId);
+		Ext.getCmp('cbo-frmWHouse-inventoryTransfer').setValue(data.frmWHouse);
+		Ext.getCmp('cbo-toWHouse-inventoryTransfer').setValue(data.toWHouse);
+		Ext.getCmp('txtarea-remarks1-inventoryTransfer').setValue(data.remarks1);
+		Ext.getCmp('txtarea-remarks2-inventoryTransfer').setValue(data.remarks2);
+		Ext.getCmp('txt-totalDscntInPrcnt-inventoryTransfer').setValue(data.totalPrcntDscnt);
+		Ext.getCmp('txt-totalDscntInAmt-inventoryTransfer').setValue(data.totalAmtDscnt);
+		Ext.getCmp('txt-netTotal-inventoryTransfer').setValue(data.netTotal);
+		Ext.getCmp('txt-grossTotal-inventoryTransfer').setValue(data.grossTotal);
 
-		salesReturnItemsStore.load({params : { docId : data.docId}});
+		inventoryTransferItemsStore.load({params : { docId : data.docId}});
 	}
 
-	Ext.define('Checkup.Sales.Return.Form.Return',
+	Ext.define('Checkup.Inventory.InventoryTransactions.InventoryTransfer.Form.InventoryTransfer',
 	{
 		extend 		: 'Ext.form.Panel',
 
@@ -88,7 +86,7 @@
 		layout 		: 'column',
 		
 		border 		: true,
-		title 		: 'Sales Return',
+		title 		: 'Inventory Goods Return',
 		//style 		: 'top : 0px !important',
 		width 		: '90%',
 
@@ -109,7 +107,7 @@
 				items 	: [
 					{
 						xtype 	: 'fieldset',
-						title 	: 'Sales Return Information',
+						title 	: 'Goods Return Information',
 						width 	: 420,
 						height 	: 426,
 						layout 	: 'column',
@@ -117,49 +115,40 @@
 						items 	: [
 							{
 								xtype 		: 'textfield',
-								fieldLabel 	: 'Sales Return #',
+								fieldLabel 	: 'Inventory Transfer #',
 								readOnly 	: true,
-								name 		: 'salesReturnId',
-								id 			: 'txt-salesReturnId-salesReturn',
+								name 		: 'inventoryTransferId',
+								id 			: 'txt-inventoryTransferId-inventoryTransfer',
 								columnWidth	: 1,
 								margin 		: '5 0 0 0'
 							}, {
-								xtype 		: 'textfield',
-								fieldLabel 	: 'Posting Date',
-								readOnly 	: true,
-								name 		: 'postingDate',
-								id 			: 'txt-postingDate-salesReturn',
-								columnWidth	: 1,
-								margin 		: '5 0 0 0',
-								value 		: getCurrentDate()
-							}, {
 								xtype 		: 'combo',
-								fieldLabel 	: 'Customer Code',
+								fieldLabel 	: 'From',
 								columnWidth : 1,
-								name 		: 'customerCode',
-								id 			: 'cbo-customerCode-salesReturn',
+								name 		: 'frmWHouse',
+								id 			: 'cbo-frmWHouse-inventoryTransfer',
 								queryMode 	: 'local',
 								triggerAction: 'all',
 								forceSelection:false,
-								displayField: 'code',
+								displayField: 'name',
 								valueField 	: 'code',
 								columnWidth	: 1,
-								store 		: businessPartnerStore,
+								store 		: warehouseStore,
 								margin 		: '5 0 0 0',
 								allowBlank 	: false
 							}, {
 								xtype 		: 'combo',
-								fieldLabel 	: 'Customer Name',
+								fieldLabel 	: 'To',
 								columnWidth : 1,
-								name 		: 'customerName',
-								id 			: 'cbo-customerName-salesReturn',
+								name 		: 'toWHouse',
+								id 			: 'cbo-toWHouse-inventoryTransfer',
 								queryMode 	: 'local',
 								triggerAction: 'all',
 								forceSelection:false,
-								displayField: 'BPName',
+								displayField: 'name',
 								valueField 	: 'code',
 								columnWidth	: 1,
-								store 		: businessPartnerStore,
+								store 		: warehouseStore,
 								margin 		: '5 0 0 0',
 								allowBlank 	: false
 							}, {
@@ -167,21 +156,21 @@
 								fieldLabel 	: 'Remarks 1',
 								columnWidth : 1,
 								name 		: 'remarks1',
-								id 			: 'txtarea-remarks1-salesReturn',
+								id 			: 'txtarea-remarks1-inventoryTransfer',
 								margin 		: '5 0 0 0'
 							}, {
 								xtype 		: 'textarea',
 								fieldLabel 	: 'Remarks 2',
 								columnWidth : 1,
 								name 		: 'remarks2',
-								id 			: 'txtarea-remarks2-salesReturn',
+								id 			: 'txtarea-remarks2-inventoryTransfer',
 								margin 		: '5 0 0 0'
 							}, {
 								xtype 		: 'textfield',
 								fieldLabel 	: 'Total Discount %',
 								readOnly 	: true,
 								name 		: 'totalDscntInPrcnt',
-								id 			: 'txt-totalDscntInPrcnt-salesReturn',
+								id 			: 'txt-totalDscntInPrcnt-inventoryTransfer',
 								columnWidth	: 1,
 								margin 		: '5 0 0 0'
 							}, {
@@ -189,36 +178,36 @@
 								fieldLabel 	: 'Total Discount Amt',
 								readOnly 	: true,
 								name 		: 'totalDscntInAmt',
-								id 			: 'txt-totalDscntInAmt-salesReturn',
+								id 			: 'txt-totalDscntInAmt-inventoryTransfer',
 								columnWidth	: 1
 							}, {
 								xtype 		: 'textfield',
 								fieldLabel 	: 'Net Total',
 								readOnly 	: true,
 								name 		: 'netTotal',
-								id 			: 'txt-netTotal-salesReturn',
+								id 			: 'txt-netTotal-inventoryTransfer',
 								columnWidth	: 1
 							}, {
 								xtype 		: 'textfield',
 								fieldLabel 	: 'Gross Total',
 								readOnly 	: true,
 								name 		: 'grossTotal',
-								id 			: 'txt-grossTotal-salesReturn',
+								id 			: 'txt-grossTotal-inventoryTransfer',
 								columnWidth	: 1,
 								margin 		: '5 0 10 0'
 							}
 						]
 					}, {
 						xtype 	: 'grid',
-						id 		: 'grid-salesReturnList-salesReturn',
-						store 	: salesReturnStore,
+						id 		: 'grid-inventoryTransferList-inventoryTransfer',
+						store 	: inventoryTransferStore,
 						columnWidth: 1,
 						height 	: 420,
 						margin 	: '10 10 10 5',
 						columns : [
-							{text : 'Sales Return ID', 	dataIndex : 'docId',	width : 88},
-							{text : 'Customer Code', 	dataIndex : 'customerCode',	width : 86},
-							{text : 'Customer Name', 	dataIndex : 'customerName',	width : 159},
+							{text : 'Inventory Transfer No', 	dataIndex : 'docId',	width : 88},
+							{text : 'From', 	dataIndex : 'frmWHouse',	width : 86},
+							{text : 'To', 	dataIndex : 'toWHouse',	width : 159},
 							{text : 'Posting Date', 	dataIndex : 'postingDate',	width : 98},
 							{text : 'Remarks 1', 	dataIndex : 'remarks1',	width : 100},
 							{text : 'Remakrs 2', 	dataIndex : 'remarks2',	width : 100},
@@ -233,8 +222,8 @@
 								{
 									populateFields(selected[0].raw);
 
-									Ext.getCmp('btn-delete-salesReturn').enable();
-									Ext.getCmp('btn-print-salesReturn').enable();
+									Ext.getCmp('btn-delete-inventoryTransfer').enable();
+									Ext.getCmp('btn-print-inventoryTransfer').enable();
 								}
 							}
 						}
@@ -243,8 +232,8 @@
 			}, {
 				xtype 	: 'grid',
 				title 	: 'Items',
-				id 		: 'grid-salesReturnItems-salesReturn',
-				store 	: salesReturnItemsStore,
+				id 		: 'grid-inventoryTransferItems-inventoryTransfer',
+				store 	: inventoryTransferItemsStore,
 				columnWidth: 1,
 				height 	: 200,
 				margin 	: '0 10 10 10',
@@ -253,25 +242,26 @@
 					{text : 'Item Code', 	dataIndex : 'itemCode', width : 63},
 					{text : 'Description', 	dataIndex : 'description',	width : 170},
 					{text : 'Vatable', 	dataIndex : 'vatable',	width : 50},
-					{text : 'Net Pur. Price', 	dataIndex : 'netPrchsPrc',	width : 95},
-					{text : 'Gross Pur. Price1', 	dataIndex : 'grossPrchsPrc',	width : 95},
-					{text : 'Sale UoM', 	dataIndex : 'saleUoM',	width : 55},
-					{text : 'Qty/Sale UoM', 	dataIndex : 'qtyPrSaleUoM',	width : 77},
-					{text : 'Real Base Net Sale Price', 	dataIndex : 'realBsNetSalePrc',	width : 139},
-					{text : 'Real Base Gross Sale Price', 	dataIndex : 'realBsNetSalePrc',	width : 139},
 					{text : 'Qty', 	dataIndex : 'qty',	width : 60},
+					{text : 'Base UoM', 	dataIndex : 'baseUoM',	width : 55},
+					{text : 'Qty/Prchs UoM', 	dataIndex : 'qtyPrPrchsUoM',	width : 83},
+					{text : 'Real Base Net Purchase Price', 	dataIndex : 'realBsNetPrchsPrc',	width : 161},
+					{text : 'Real Base Gross Purchase Price', 	dataIndex : 'realBsGrossPrchsPrc',	width : 161},
+					{text : 'Real Net Purchase Price', 	dataIndex : 'realNetPrchsPrc',	width : 139},
+					{text : 'Real Gross Purchase Price', 	dataIndex : 'realGrossPrchsPrc',	width : 139},
+					{text : 'Net Pur. Price', 	dataIndex : 'netPrchsPrc',	width : 95},
+					{text : 'Gross Pur. Price', 	dataIndex : 'grossPrchsPrc',	width : 95},
 					{text : '% Discount', 	dataIndex : 'prcntDscnt',	width : 80},
 					{text : 'Amt Discount', 	dataIndex : 'amtDscnt',	width : 77},
-					{text : 'Net Sale Price', 	dataIndex : 'netSalePrc',	width : 90},
-					{text : 'Gross Sale Price', 	dataIndex : 'grossSalePrc',	width : 90},
 					{text : 'Row Net Total', 	dataIndex : 'rowNetTotal',	width : 90},	
 					{text : 'Row Gross Total', 	dataIndex : 'rowGrossTotal',	width : 90}
+					
 				],
 				tbar 	: [
 					{
 						xtype 	: 'button',
 						text 	: 'Add Item',
-						id 		: 'btn-add-item-salesReturn',
+						id 		: 'btn-add-item-inventoryTransfer',
 						disabled : true,
 						handler	: function()
 						{
@@ -280,7 +270,7 @@
 					}, {
 						xtype 	: 'button',
 						text 	: 'Delete Item',
-						id 		: 'btn-delete-item-salesReturn',
+						id 		: 'btn-delete-item-inventoryTransfer',
 						disabled: true,
 						handler : function()
 						{
@@ -345,7 +335,7 @@
 				}*/
 			}, {
 				text 	: 'Delete',
-				id 		: 'btn-delete-salesReturn',
+				id 		: 'btn-delete-inventoryTransfer',
 				disabled: true,
 				/*handler : function()
 				{
@@ -396,14 +386,14 @@
 				}*/
 			}, {
 				text 	: 'Print',
-				id 		: 'btn-print-salesReturn',
+				id 		: 'btn-print-inventoryTransfer',
 				disabled: true,
 				handler : function()
 				{
 					new Ext.Window({
                         height: Ext.getBody().getViewSize().height,
                         width: Ext.getBody().getViewSize().width - 20,
-                        html : '<iframe style="width:100%;height:' + (Ext.getBody().getViewSize().height - 30) + 'px;" frameborder="0"  src="' + reportSalesReturnUrl + '?docId=' + docId + '"></iframe>',
+                        html : '<iframe style="width:100%;height:' + (Ext.getBody().getViewSize().height - 30) + 'px;" frameborder="0"  src="' + reportInventoryTransferUrl + '?docId=' + docId + '"></iframe>',
                         modal: true
                     }).show();
 				}

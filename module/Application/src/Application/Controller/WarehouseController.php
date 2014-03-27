@@ -38,6 +38,28 @@ class WarehouseController extends Controller
         return new JsonModel($retVal);
     }
 
+    public function getActiveWarehouseListAction()
+    {
+        $retVal = array(
+            'success'       => false,
+            'rows'          => array(),
+            'totalRecords'  => 0
+        );
+
+        $warehouse = $this->model('Warehouse');
+        $result = $warehouse->getActiveWarehouseList();
+
+        if(!empty($result))
+        {
+            $retVal['success'] = true;
+            $retVal['rows'] = $result;
+            $retVal['totalRecords'] = count($result);
+        }
+
+
+        return new JsonModel($retVal);
+    }
+
     public function saveWarehouseAction()
     {
         $data = array();

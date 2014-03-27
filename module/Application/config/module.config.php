@@ -85,7 +85,11 @@ return array(
             'Application\Controller\PurchaseOrderItem' => 'Application\Controller\PurchaseOrderItemController',
             'Application\Controller\GRPO' => 'Application\Controller\GRPOController',
             'Application\Controller\GRPOItem' => 'Application\Controller\GRPOItemController',
-            'Application\Controller\ItemMasterData' => 'Application\Controller\ItemMasterDataController'
+            'Application\Controller\ItemMasterData' => 'Application\Controller\ItemMasterDataController',
+            'Application\Controller\GoodsReturn' => 'Application\Controller\GoodsReturnController',
+            'Application\Controller\GoodsReturnItem' => 'Application\Controller\GoodsReturnItemController',
+            'Application\Controller\InventoryTransfer' => 'Application\Controller\InventoryTransferController',
+            'Application\Controller\InventoryTransferItem' => 'Application\Controller\InventoryTransferItemController'
         ),
     ),
     'controller_plugins' => array(

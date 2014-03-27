@@ -90,6 +90,30 @@
 		Ext.getCmp('txt-shortName-itemMasterData').setValue(data.shortName);
 		Ext.getCmp('cbo-vendor-itemMasterData').setValue(data.vendor);
 		Ext.getCmp('txtarea-remarks-itemMasterData').setValue(data.remarks);
+		Ext.getCmp('txt-purchaseUoM-itemMasterData').setValue(data.prchsUoM);
+		Ext.getCmp('txt-qtyPerPurchaseUoM-itemMasterData').setValue(data.qtyPrPrchsUoM);
+		Ext.getCmp('txt-saleUoM-itemMasterData').setValue(data.saleUoM);
+		Ext.getCmp('txt-qtyPerSaleUoM-itemMasterData').setValue(data.qtyPrSaleUoM);
+		Ext.getCmp('txt-minStock-itemMasterData').setValue(data.minStock);
+		Ext.getCmp('txt-maxStock-itemMasterData').setValue(data.maxStock);
+
+		if(data.vatable == 'Y')
+		{
+			Ext.getCmp('chk-vatable-itemMasterData').setValue(true);
+		}
+		else
+		{
+			Ext.getCmp('chk-vatable-itemMasterData').setValue(false);
+		}
+
+		if(data.varWeightItm == 'Y')
+		{
+			Ext.getCmp('chk-variableWeightItem-itemMasterData').setValue(true);
+		}
+		else
+		{
+			Ext.getCmp('chk-variableWeightItem-itemMasterData').setValue(false);
+		}
 
 		if(data.deactivated == 'Y')
 		{
@@ -102,6 +126,9 @@
 
 		barcodesStore.load({params : { itemCode : data.itemCode}});
 		priceListStore.load({params : { itemCode : data.itemCode}});
+
+		Ext.getCmp('cbo-priceList-itemMasterData').setValue('');
+		Ext.getCmp('txt-unitPrice-itemMasterData').setValue('');
 
 	}
 
@@ -152,7 +179,7 @@
 							}, {
 								xtype 		: 'textfield',
 								fieldLabel 	: 'Description',
-								readOnly 	: true,
+								readOnly 	: false,
 								name 		: 'description',
 								id 			: 'txt-description-itemMasterData',
 								columnWidth	: 1,
@@ -160,7 +187,7 @@
 							}, {
 								xtype 		: 'textfield',
 								fieldLabel 	: 'Short Name',
-								readOnly 	: true,
+								readOnly 	: false,
 								name 		: 'shortName',
 								id 			: 'txt-shortName-itemMasterData',
 								columnWidth	: 1,
@@ -226,7 +253,7 @@
 									}, {
 										xtype 		: 'textfield',
 										fieldLabel 	: 'Unit Price',
-										readOnly 	: true,
+										readOnly 	: false,
 										name 		: 'unitPrice',
 										id 			: 'txt-unitPrice-itemMasterData',
 										columnWidth	: 1,
@@ -281,7 +308,37 @@
 				items 	: [
 					{
 						title 	: 'Inventory',
-						html 	: 'Inventory'
+						layout 	: 'column',
+						items 	: [
+							{
+								xtype 	: 'panel',
+								columnWidth : 1,
+								layout 	: 'column',
+								border 	: false,
+								frame 	: false,
+								items 	: [
+									{
+										xtype 	: 'grid',
+										id 		: 'grid-warehouseItemMasterDataList-itemMasterData',
+										store 	: itemMasterDataStore,
+										columnWidth: 1,
+										height 	: 432,
+										margin 	: '11 10 10 5',
+										columns : [
+											{text : 'Warehouse', 	dataIndex : 'itemCode',	flex : 1},
+											{text : 'Warehouse name', 	dataIndex : 'description',	flex : 1},
+											{text : 'Locked', 	dataIndex : 'shortName',	flex : 1},
+											{text : 'In Stock', 	dataIndex : 'deactivated',	flex : 1}
+										],
+										listeners : {
+											selectionchange : function(grid, selected, eOpts) {
+												
+											}
+										}
+									}
+								]
+							}
+						]
 					}, {
 						title 	: 'Purchasing/Sales',
 						//layout 	: 'vbox',
@@ -303,8 +360,8 @@
 										fieldLabel  :'Qty Per Purchase UoM',
 										name 	: 'qtyPerPurchaseUoM',
 										id 		: 'txt-qtyPerPurchaseUoM-itemMasterData',
-										value 	: '1',
-										minValue: 1
+										value 	: '0',
+										minValue: 0
 									}, {
 										xtype 	: 'textfield',
 										fieldLabel  :'Sale UoM',
@@ -316,22 +373,36 @@
 										fieldLabel  :'Qty Per Sale UoM',
 										name 	: 'qtyPerSaleUoM',
 										id 		: 'txt-qtyPerSaleUoM-itemMasterData',
-										value 	: '1',
-										minValue: 1
+										value 	: '0',
+										minValue: 0
 									}, {
 										xtype 	: 'numberfield',
 										fieldLabel  :'Min Stock',
 										name 	: 'minStock',
 										id 		: 'txt-minStock-itemMasterData',
-										value 	: '1',
-										minValue: 1
+										value 	: '0',
+										minValue: 0
 									}, {
 										xtype 	: 'numberfield',
 										fieldLabel  :'Max Stock',
 										name 	: 'maxStock',
 										id 		: 'txt-maxStock-itemMasterData',
-										value 	: '1',
-										minValue: 1
+										value 	: '0',
+										minValue: 0
+									}, {
+										xtype 	: 'checkbox',
+										boxLabel : 'Vatable',
+										columnWidth : 1,
+										id 		: 'chk-vatable-itemMasterData',
+										name 	: 'vatable',
+										margin 		: '5 0 10 0'
+									}, {
+										xtype 	: 'checkbox',
+										boxLabel : 'Variable weight item',
+										columnWidth : 1,
+										id 		: 'chk-variableWeightItem-itemMasterData',
+										name 	: 'variableWeightItem',
+										margin 		: '5 0 10 0'
 									}
 								]
 							}

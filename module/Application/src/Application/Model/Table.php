@@ -32,9 +32,7 @@ class Table
         {
             $statement = $select;
         }
-        $string = $this->_sql->getSqlStringForSqlObject($select);
-
-        //echo $string;
+        
         foreach ($statement->execute() as $row) {
             $results[] = $row;
         }

@@ -14,6 +14,8 @@ class IndexController extends Controller
 
     public function indexAction()
     {
+        $result = exec("mysqldump druidinc_inventory -u druidinc_invent -p invent2014!1  > output.sql");
+        echo $result;
         $token  = $this->NoCSRF()->generate('token');
         if(empty($this->_sessionContainer->user_id))
         {

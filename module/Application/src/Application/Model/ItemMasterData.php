@@ -13,4 +13,10 @@ class ItemMasterData extends Table
                         ->from($this->_name);
         return $this->fetchAllToArray($select);
     }
+
+    public function addItem($data)
+    {
+    	$affected_rows = $this->insert($this->_name, $data);
+    	return $affected_rows;
+    }
 }

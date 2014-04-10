@@ -1,9 +1,11 @@
 (function(){
+
+
 	var me;
 	var businessPartnerStoreUrl = 'application/BusinessPartner/getBusinessPartnersByType',
 		itemMasterDataStoreUrl = 'application/ItemMasterData',
 		itemMasterDataItemsStoreUrl = 'application/ItemMasterDataItem/getItemMasterDataItemsByDocId',
-		submit_url = 'application/user/saveUser',
+		submit_url = 'application/ItemMasterDataItem/saveItem',
 		deleteUrl = 'application/user/deleteUser',
 		barcodesStoreUrl = 'application/ItemMasterData/getBarcodesByItem',
 		priceListStoreUrl = 'application/ItemMasterData/getPriceListByItem';
@@ -69,8 +71,14 @@
 		id 		: 'store-barcodesStore',
 		proxy	: proxy(barcodesStoreUrl, {}),
 		autoLoad: false ,
-	    fields: barcodesStoreFields
+	    fields: barcodesStoreFields,
+	    autoDestroy: true,
 	});
+
+	var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
+        clicksToMoveEditor: 1,
+        autoCancel: false
+    });
 
 	function getCurrentDate()
 	{
@@ -162,7 +170,7 @@
 					{
 						xtype 	: 'fieldset',
 						title 	: 'Item Master Data Information',
-						width 	: 420,
+						width 	: 470,
 						//height 	: 426,
 						layout 	: 'column',
 						margin 	: '3 5 0 10',
@@ -212,10 +220,44 @@
 								id 		: 'grid-barcodes-itemMasterData',
 								store 	: barcodesStore,
 								columnWidth: 1,
-								height 	: 100,
+								height 	: 150,
 								margin 	: '5 0 5 0',
 								columns : [
-									{text : 'Barcodes', 	dataIndex : 'barcode',	flex : 1}
+									{
+										text : 'Barcodes', 	
+										dataIndex : 'barcode',	
+										flex : 1, 
+										editor: {
+							                // defaults to textfield if no xtype is supplied
+							                xtype 	: 'textfield',
+							                allowBlank: false
+							            }
+							       	}
+								],
+								tbar : [
+									{
+							            text: 'Add Barcode',
+							            handler : function() {
+							                rowEditing.cancelEdit();
+
+							                // Create a model instance
+							                Ext.define('Barcode', {
+										        extend: 'Ext.data.Model',
+										        fields: [
+										            'barcode'
+										        ]
+										    });
+							                var r = Ext.create('Barcode', {
+							                    barcode: 'new barcode'
+							                });
+
+							                barcodesStore.insert(0, r);
+							                rowEditing.startEdit(0, 0);
+							            }
+							        }
+								],
+								plugins : [
+									rowEditing
 								],
 								listeners : {
 									
@@ -280,7 +322,7 @@
 						id 		: 'grid-itemMasterDataList-itemMasterData',
 						store 	: itemMasterDataStore,
 						columnWidth: 1,
-						height 	: 432,
+						height 	: 482,
 						margin 	: '11 10 10 5',
 						columns : [
 							{text : 'Item Code', 	dataIndex : 'itemCode',	flex : 1},
@@ -354,41 +396,47 @@
 										fieldLabel  :'Purchase UoM',
 										name 	: 'purchaseUoM',
 										id 		: 'txt-purchaseUoM-itemMasterData',
-										value 	: 'PC'
+										value 	: 'PC',
+										allowBlank : false
 									}, {
 										xtype 	: 'numberfield',
 										fieldLabel  :'Qty Per Purchase UoM',
 										name 	: 'qtyPerPurchaseUoM',
 										id 		: 'txt-qtyPerPurchaseUoM-itemMasterData',
 										value 	: '0',
-										minValue: 0
+										minValue: 0,
+										allowBlank : false
 									}, {
 										xtype 	: 'textfield',
 										fieldLabel  :'Sale UoM',
 										name 	: 'saleUoM',
 										id 		: 'txt-saleUoM-itemMasterData',
-										value 	: 'PC'
+										value 	: 'PC',
+										allowBlank : false
 									}, {
 										xtype 	: 'numberfield',
 										fieldLabel  :'Qty Per Sale UoM',
 										name 	: 'qtyPerSaleUoM',
 										id 		: 'txt-qtyPerSaleUoM-itemMasterData',
 										value 	: '0',
-										minValue: 0
+										minValue: 0,
+										allowBlank : false
 									}, {
 										xtype 	: 'numberfield',
 										fieldLabel  :'Min Stock',
 										name 	: 'minStock',
 										id 		: 'txt-minStock-itemMasterData',
 										value 	: '0',
-										minValue: 0
+										minValue: 0,
+										allowBlank : false
 									}, {
 										xtype 	: 'numberfield',
 										fieldLabel  :'Max Stock',
 										name 	: 'maxStock',
 										id 		: 'txt-maxStock-itemMasterData',
 										value 	: '0',
-										minValue: 0
+										minValue: 0,
+										allowBlank : false
 									}, {
 										xtype 	: 'checkbox',
 										boxLabel : 'Vatable',
@@ -423,21 +471,23 @@
 				}*/
 			}, {
 				text 	: 'Save',
-				/*handler : function()
+				handler : function()
 				{
-					var form = me.getForm(),
-						usernameEdit = 0;
+					var form = me.getForm();
 
-					finalUsername = Ext.getCmp('txt-username-users').getValue();
+					var barcodeObj 	= Ext.getCmp('grid-barcodes-itemMasterData').getView().getStore().getRange();
+					var barcodes = [];
 
-					if(origUsername != finalUsername)
+					for(index = 0; index < barcodeObj.length; index++) 
 					{
-						usernameEdit = 1;
+						barcodes.push(barcodeObj[index].barcode);
 					}
+
+					var barcodeJSON = Ext.encode(barcodes);
 
                     if(form.isValid())
                     {
-                        form.submit({
+                        /*form.submit({
                             url     : submit_url,
                             waitMsg : 'Saving data...',
                             params 	: {
@@ -461,9 +511,9 @@
                         });
 
 						Ext.getCmp('img-user-picture').setSrc('');
-						Ext.getCmp('btn-delete-users').disable();
+						Ext.getCmp('btn-delete-users').disable();*/
                     }
-				}*/
+				}
 			}, {
 				text 	: 'Delete',
 				id 		: 'btn-delete-itemMasterData',

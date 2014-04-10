@@ -14,4 +14,10 @@ class Barcode extends Table
                         ->where(array('itemCode' => $itemCode));
         return $this->fetchAllToArray($select);
     }
+
+    public function addBarcode($data)
+    {
+    	$affected_rows = $this->insert($this->_name, $data);
+    	return $affected_rows;
+    }
 }
